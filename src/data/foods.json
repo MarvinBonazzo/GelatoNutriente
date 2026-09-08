@@ -1,0 +1,1154 @@
+[
+  {
+    "id": "food-001",
+    "name": "Pasta di semola",
+    "category": "Cereali",
+    "per100g": {
+      "kcal": 353,
+      "protein": 13,
+      "carbs": 71,
+      "fat": 1.5
+    },
+    "preparation": "secca",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-002",
+    "name": "Pasta integrale",
+    "category": "Cereali",
+    "per100g": {
+      "kcal": 348,
+      "protein": 13,
+      "carbs": 65,
+      "fat": 2.5
+    },
+    "preparation": "secca",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-003",
+    "name": "Riso bianco",
+    "category": "Cereali",
+    "per100g": {
+      "kcal": 356,
+      "protein": 7,
+      "carbs": 79,
+      "fat": 0.6
+    },
+    "preparation": "crudo",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-004",
+    "name": "Riso integrale",
+    "category": "Cereali",
+    "per100g": {
+      "kcal": 363,
+      "protein": 7.5,
+      "carbs": 76,
+      "fat": 2.7
+    },
+    "preparation": "crudo",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-005",
+    "name": "Farro",
+    "category": "Cereali",
+    "per100g": {
+      "kcal": 335,
+      "protein": 15,
+      "carbs": 67,
+      "fat": 2.5
+    },
+    "preparation": "secco",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-006",
+    "name": "Orzo perlato",
+    "category": "Cereali",
+    "per100g": {
+      "kcal": 319,
+      "protein": 10,
+      "carbs": 70,
+      "fat": 1.4
+    },
+    "preparation": "secco",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-007",
+    "name": "Cous cous",
+    "category": "Cereali",
+    "per100g": {
+      "kcal": 356,
+      "protein": 12.8,
+      "carbs": 72,
+      "fat": 1.5
+    },
+    "preparation": "secco",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-008",
+    "name": "Quinoa",
+    "category": "Cereali",
+    "per100g": {
+      "kcal": 368,
+      "protein": 14,
+      "carbs": 64,
+      "fat": 6
+    },
+    "preparation": "secca",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-009",
+    "name": "Fiocchi di avena",
+    "category": "Cereali",
+    "per100g": {
+      "kcal": 370,
+      "protein": 13,
+      "carbs": 59,
+      "fat": 7
+    },
+    "preparation": "secchi",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-010",
+    "name": "Pane integrale",
+    "category": "Cereali",
+    "per100g": {
+      "kcal": 247,
+      "protein": 9,
+      "carbs": 41,
+      "fat": 4
+    },
+    "preparation": "pronto al consumo",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-011",
+    "name": "Pane bianco",
+    "category": "Cereali",
+    "per100g": {
+      "kcal": 265,
+      "protein": 9,
+      "carbs": 49,
+      "fat": 3.2
+    },
+    "preparation": "pronto al consumo",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-012",
+    "name": "Fette biscottate",
+    "category": "Cereali",
+    "per100g": {
+      "kcal": 408,
+      "protein": 11,
+      "carbs": 76,
+      "fat": 6
+    },
+    "preparation": "pronte al consumo",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-013",
+    "name": "Farina di mais",
+    "category": "Cereali",
+    "per100g": {
+      "kcal": 362,
+      "protein": 8.7,
+      "carbs": 76,
+      "fat": 2.7
+    },
+    "preparation": "secca",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-014",
+    "name": "Petto di pollo",
+    "category": "Proteine",
+    "per100g": {
+      "kcal": 110,
+      "protein": 23,
+      "carbs": 0,
+      "fat": 1.2
+    },
+    "preparation": "crudo, senza pelle",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-015",
+    "name": "Petto di tacchino",
+    "category": "Proteine",
+    "per100g": {
+      "kcal": 107,
+      "protein": 24,
+      "carbs": 0,
+      "fat": 1
+    },
+    "preparation": "crudo, senza pelle",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-016",
+    "name": "Manzo magro",
+    "category": "Proteine",
+    "per100g": {
+      "kcal": 137,
+      "protein": 21,
+      "carbs": 0,
+      "fat": 5.8
+    },
+    "preparation": "crudo",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-017",
+    "name": "Lonza di maiale",
+    "category": "Proteine",
+    "per100g": {
+      "kcal": 143,
+      "protein": 21,
+      "carbs": 0,
+      "fat": 6.5
+    },
+    "preparation": "cruda",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-018",
+    "name": "Uovo intero",
+    "category": "Proteine",
+    "per100g": {
+      "kcal": 143,
+      "protein": 12.6,
+      "carbs": 0.7,
+      "fat": 9.5
+    },
+    "preparation": "crudo, senza guscio",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-019",
+    "name": "Albume",
+    "category": "Proteine",
+    "per100g": {
+      "kcal": 46,
+      "protein": 10.7,
+      "carbs": 0.7,
+      "fat": 0.2
+    },
+    "preparation": "crudo",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-020",
+    "name": "Merluzzo",
+    "category": "Proteine",
+    "per100g": {
+      "kcal": 82,
+      "protein": 18,
+      "carbs": 0,
+      "fat": 0.7
+    },
+    "preparation": "crudo",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-021",
+    "name": "Salmone",
+    "category": "Proteine",
+    "per100g": {
+      "kcal": 208,
+      "protein": 20,
+      "carbs": 0,
+      "fat": 13
+    },
+    "preparation": "crudo",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-022",
+    "name": "Orata",
+    "category": "Proteine",
+    "per100g": {
+      "kcal": 121,
+      "protein": 20,
+      "carbs": 0,
+      "fat": 4.8
+    },
+    "preparation": "cruda, parte edibile",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-023",
+    "name": "Tonno al naturale",
+    "category": "Proteine",
+    "per100g": {
+      "kcal": 116,
+      "protein": 26,
+      "carbs": 0,
+      "fat": 1
+    },
+    "preparation": "sgocciolato",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-024",
+    "name": "Gamberi",
+    "category": "Proteine",
+    "per100g": {
+      "kcal": 85,
+      "protein": 20,
+      "carbs": 0,
+      "fat": 0.5
+    },
+    "preparation": "crudi, sgusciati",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-025",
+    "name": "Bresaola",
+    "category": "Proteine",
+    "per100g": {
+      "kcal": 151,
+      "protein": 32,
+      "carbs": 0.5,
+      "fat": 2
+    },
+    "preparation": "pronta al consumo",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-026",
+    "name": "Tofu al naturale",
+    "category": "Proteine",
+    "per100g": {
+      "kcal": 76,
+      "protein": 8,
+      "carbs": 1.9,
+      "fat": 4.8
+    },
+    "preparation": "pronto al consumo",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-027",
+    "name": "Latte parzialmente scremato",
+    "category": "Latticini",
+    "per100g": {
+      "kcal": 46,
+      "protein": 3.3,
+      "carbs": 4.9,
+      "fat": 1.6
+    },
+    "preparation": "liquido, valori per 100 g",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-028",
+    "name": "Yogurt bianco intero",
+    "category": "Latticini",
+    "per100g": {
+      "kcal": 61,
+      "protein": 3.5,
+      "carbs": 4.7,
+      "fat": 3.3
+    },
+    "preparation": "senza zuccheri aggiunti",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-029",
+    "name": "Yogurt greco bianco 0%",
+    "category": "Latticini",
+    "per100g": {
+      "kcal": 59,
+      "protein": 10.3,
+      "carbs": 3.6,
+      "fat": 0.4
+    },
+    "preparation": "senza zuccheri aggiunti",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-030",
+    "name": "Ricotta vaccina",
+    "category": "Latticini",
+    "per100g": {
+      "kcal": 146,
+      "protein": 8.8,
+      "carbs": 3.5,
+      "fat": 10.9
+    },
+    "preparation": "fresca",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-031",
+    "name": "Mozzarella vaccina",
+    "category": "Latticini",
+    "per100g": {
+      "kcal": 253,
+      "protein": 18.7,
+      "carbs": 0.7,
+      "fat": 19.5
+    },
+    "preparation": "sgocciolata",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-032",
+    "name": "Parmigiano Reggiano",
+    "category": "Latticini",
+    "per100g": {
+      "kcal": 402,
+      "protein": 32,
+      "carbs": 0,
+      "fat": 30
+    },
+    "preparation": "stagionato",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-033",
+    "name": "Fiocchi di latte",
+    "category": "Latticini",
+    "per100g": {
+      "kcal": 98,
+      "protein": 11,
+      "carbs": 3.4,
+      "fat": 4.3
+    },
+    "preparation": "pronti al consumo",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-034",
+    "name": "Ceci",
+    "category": "Legumi",
+    "per100g": {
+      "kcal": 120,
+      "protein": 6.7,
+      "carbs": 18.9,
+      "fat": 2.4
+    },
+    "preparation": "cotti e scolati",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-035",
+    "name": "Lenticchie",
+    "category": "Legumi",
+    "per100g": {
+      "kcal": 116,
+      "protein": 9,
+      "carbs": 20,
+      "fat": 0.4
+    },
+    "preparation": "cotte e scolate",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-036",
+    "name": "Fagioli cannellini",
+    "category": "Legumi",
+    "per100g": {
+      "kcal": 91,
+      "protein": 6,
+      "carbs": 14,
+      "fat": 0.6
+    },
+    "preparation": "cotti e scolati",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-037",
+    "name": "Fagioli borlotti",
+    "category": "Legumi",
+    "per100g": {
+      "kcal": 93,
+      "protein": 6.9,
+      "carbs": 16,
+      "fat": 0.5
+    },
+    "preparation": "cotti e scolati",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-038",
+    "name": "Piselli",
+    "category": "Legumi",
+    "per100g": {
+      "kcal": 81,
+      "protein": 5.4,
+      "carbs": 14,
+      "fat": 0.4
+    },
+    "preparation": "crudi, sgranati",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-039",
+    "name": "Ceci secchi",
+    "category": "Legumi",
+    "per100g": {
+      "kcal": 364,
+      "protein": 19,
+      "carbs": 61,
+      "fat": 6
+    },
+    "preparation": "secchi",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-040",
+    "name": "Zucchine",
+    "category": "Verdura",
+    "per100g": {
+      "kcal": 17,
+      "protein": 1.2,
+      "carbs": 3.1,
+      "fat": 0.3
+    },
+    "preparation": "crude",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-041",
+    "name": "Pomodori",
+    "category": "Verdura",
+    "per100g": {
+      "kcal": 18,
+      "protein": 0.9,
+      "carbs": 3.9,
+      "fat": 0.2
+    },
+    "preparation": "crudi",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-042",
+    "name": "Carote",
+    "category": "Verdura",
+    "per100g": {
+      "kcal": 41,
+      "protein": 0.9,
+      "carbs": 9.6,
+      "fat": 0.2
+    },
+    "preparation": "crude",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-043",
+    "name": "Broccoli",
+    "category": "Verdura",
+    "per100g": {
+      "kcal": 34,
+      "protein": 2.8,
+      "carbs": 6.6,
+      "fat": 0.4
+    },
+    "preparation": "crudi",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-044",
+    "name": "Spinaci",
+    "category": "Verdura",
+    "per100g": {
+      "kcal": 23,
+      "protein": 2.9,
+      "carbs": 3.6,
+      "fat": 0.4
+    },
+    "preparation": "crudi",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-045",
+    "name": "Lattuga",
+    "category": "Verdura",
+    "per100g": {
+      "kcal": 15,
+      "protein": 1.4,
+      "carbs": 2.9,
+      "fat": 0.2
+    },
+    "preparation": "cruda",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-046",
+    "name": "Peperoni",
+    "category": "Verdura",
+    "per100g": {
+      "kcal": 26,
+      "protein": 1,
+      "carbs": 6,
+      "fat": 0.3
+    },
+    "preparation": "crudi",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-047",
+    "name": "Melanzane",
+    "category": "Verdura",
+    "per100g": {
+      "kcal": 25,
+      "protein": 1,
+      "carbs": 6,
+      "fat": 0.2
+    },
+    "preparation": "crude",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-048",
+    "name": "Finocchi",
+    "category": "Verdura",
+    "per100g": {
+      "kcal": 31,
+      "protein": 1.2,
+      "carbs": 7.3,
+      "fat": 0.2
+    },
+    "preparation": "crudi",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-049",
+    "name": "Zucca",
+    "category": "Verdura",
+    "per100g": {
+      "kcal": 26,
+      "protein": 1,
+      "carbs": 6.5,
+      "fat": 0.1
+    },
+    "preparation": "cruda, senza semi e buccia",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-050",
+    "name": "Patate",
+    "category": "Verdura",
+    "per100g": {
+      "kcal": 77,
+      "protein": 2,
+      "carbs": 17,
+      "fat": 0.1
+    },
+    "preparation": "crude, pelate",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-051",
+    "name": "Cipolle",
+    "category": "Verdura",
+    "per100g": {
+      "kcal": 40,
+      "protein": 1.1,
+      "carbs": 9.3,
+      "fat": 0.1
+    },
+    "preparation": "crude",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-052",
+    "name": "Funghi champignon",
+    "category": "Verdura",
+    "per100g": {
+      "kcal": 22,
+      "protein": 3.1,
+      "carbs": 3.3,
+      "fat": 0.3
+    },
+    "preparation": "crudi",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-053",
+    "name": "Mela",
+    "category": "Frutta",
+    "per100g": {
+      "kcal": 52,
+      "protein": 0.3,
+      "carbs": 14,
+      "fat": 0.2
+    },
+    "preparation": "parte edibile con buccia",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-054",
+    "name": "Banana",
+    "category": "Frutta",
+    "per100g": {
+      "kcal": 89,
+      "protein": 1.1,
+      "carbs": 23,
+      "fat": 0.3
+    },
+    "preparation": "senza buccia",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-055",
+    "name": "Pera",
+    "category": "Frutta",
+    "per100g": {
+      "kcal": 57,
+      "protein": 0.4,
+      "carbs": 15,
+      "fat": 0.1
+    },
+    "preparation": "parte edibile",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-056",
+    "name": "Arancia",
+    "category": "Frutta",
+    "per100g": {
+      "kcal": 47,
+      "protein": 0.9,
+      "carbs": 12,
+      "fat": 0.1
+    },
+    "preparation": "senza buccia",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-057",
+    "name": "Kiwi",
+    "category": "Frutta",
+    "per100g": {
+      "kcal": 61,
+      "protein": 1.1,
+      "carbs": 15,
+      "fat": 0.5
+    },
+    "preparation": "senza buccia",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-058",
+    "name": "Fragole",
+    "category": "Frutta",
+    "per100g": {
+      "kcal": 32,
+      "protein": 0.7,
+      "carbs": 7.7,
+      "fat": 0.3
+    },
+    "preparation": "parte edibile",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-059",
+    "name": "Mirtilli",
+    "category": "Frutta",
+    "per100g": {
+      "kcal": 57,
+      "protein": 0.7,
+      "carbs": 14,
+      "fat": 0.3
+    },
+    "preparation": "parte edibile",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-060",
+    "name": "Pesca",
+    "category": "Frutta",
+    "per100g": {
+      "kcal": 39,
+      "protein": 0.9,
+      "carbs": 9.5,
+      "fat": 0.3
+    },
+    "preparation": "senza nocciolo",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-061",
+    "name": "Uva",
+    "category": "Frutta",
+    "per100g": {
+      "kcal": 69,
+      "protein": 0.7,
+      "carbs": 18,
+      "fat": 0.2
+    },
+    "preparation": "parte edibile",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-062",
+    "name": "Olio extravergine di oliva",
+    "category": "Grassi e frutta secca",
+    "per100g": {
+      "kcal": 899,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 99.9
+    },
+    "preparation": "valori per 100 g, non ml",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-063",
+    "name": "Mandorle",
+    "category": "Grassi e frutta secca",
+    "per100g": {
+      "kcal": 579,
+      "protein": 21,
+      "carbs": 22,
+      "fat": 50
+    },
+    "preparation": "sgusciate",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-064",
+    "name": "Noci",
+    "category": "Grassi e frutta secca",
+    "per100g": {
+      "kcal": 654,
+      "protein": 15,
+      "carbs": 14,
+      "fat": 65
+    },
+    "preparation": "sgusciate",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-065",
+    "name": "Nocciole",
+    "category": "Grassi e frutta secca",
+    "per100g": {
+      "kcal": 628,
+      "protein": 15,
+      "carbs": 17,
+      "fat": 61
+    },
+    "preparation": "sgusciate",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-066",
+    "name": "Semi di chia",
+    "category": "Grassi e frutta secca",
+    "per100g": {
+      "kcal": 486,
+      "protein": 17,
+      "carbs": 42,
+      "fat": 31
+    },
+    "preparation": "secchi",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-067",
+    "name": "Avocado",
+    "category": "Grassi e frutta secca",
+    "per100g": {
+      "kcal": 160,
+      "protein": 2,
+      "carbs": 8.5,
+      "fat": 14.7
+    },
+    "preparation": "senza buccia e nocciolo",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-068",
+    "name": "Burro",
+    "category": "Grassi e frutta secca",
+    "per100g": {
+      "kcal": 717,
+      "protein": 0.9,
+      "carbs": 0.1,
+      "fat": 81
+    },
+    "preparation": "pronto al consumo",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-069",
+    "name": "Miele",
+    "category": "Altro",
+    "per100g": {
+      "kcal": 304,
+      "protein": 0.3,
+      "carbs": 82,
+      "fat": 0
+    },
+    "preparation": "pronto al consumo",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-070",
+    "name": "Cioccolato fondente 70%",
+    "category": "Altro",
+    "per100g": {
+      "kcal": 598,
+      "protein": 7.8,
+      "carbs": 46,
+      "fat": 43
+    },
+    "preparation": "pronto al consumo",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-071",
+    "name": "Passata di pomodoro",
+    "category": "Altro",
+    "per100g": {
+      "kcal": 29,
+      "protein": 1.4,
+      "carbs": 4.5,
+      "fat": 0.2
+    },
+    "preparation": "senza condimenti",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  },
+  {
+    "id": "food-072",
+    "name": "Confettura",
+    "category": "Altro",
+    "per100g": {
+      "kcal": 250,
+      "protein": 0.3,
+      "carbs": 62,
+      "fat": 0.1
+    },
+    "preparation": "valore indicativo generico",
+    "source": "Dataset dimostrativo GelatoNutriente v1: valori indicativi, non certificati.",
+    "isCustom": false,
+    "createdAt": "2026-09-08T00:00:00.000Z",
+    "updatedAt": "2026-09-08T00:00:00.000Z"
+  }
+]
