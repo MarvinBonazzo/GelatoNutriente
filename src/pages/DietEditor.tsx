@@ -9,6 +9,8 @@ import { FoodCatalog } from '../components/FoodCatalog'
 import { NutrientSummary, format } from '../components/NutrientSummary'
 import { Modal } from '../components/Modal'
 import { PatientForm } from '../components/PatientForm'
+import { DietActions } from '../components/DietActions'
+import { DietGenerator } from '../components/DietGenerator'
 
 export function DietEditor() {
   const { draft, dirty, diets, patients, foods, editDraft, setDraft, saveDraft } = useAppStore()
@@ -60,7 +62,7 @@ export function DietEditor() {
   return <>
     <div className="page-heading"><div><p className="eyebrow">IL TUO SPAZIO DI LAVORO</p><h1>Piani alimentari<span className="heading-dot">.</span></h1><p>Organizza pasti, porzioni e alternative per ogni giorno.</p></div><button className="button secondary" onClick={() => replaceDraft(createDiet())}><FilePlus2 size={17} />Nuovo piano</button></div>
     <div className="plan-toolbar"><label className="plan-picker"><span>Piano aperto</span><select aria-label="Apri piano salvato" value={diets.some(d => d.id === draft.id) ? draft.id : ''} onChange={e => { const diet = diets.find(d => d.id === e.target.value); if (diet) replaceDraft(diet) }}><option value="" disabled>Nuovo piano · non salvato</option>{diets.map(diet => <option key={diet.id} value={diet.id}>{diet.name}</option>)}</select></label><span className={`save-status ${dirty ? 'unsaved' : ''}`}><i />{dirty ? 'Modifiche da salvare' : draft.revision ? 'Salvato nel browser' : 'Bozza da compilare'}</span><Link className="text-link preview-link" to="/anteprima"><Eye size={17} />Anteprima paziente</Link></div>
-    <section className="plan-details panel" aria-label="Informazioni del piano">
+    <div className="editor-extra-actions"><DietActions diet={draft} /><DietGenerator /></div><section className="plan-details panel" aria-label="Informazioni del piano">
       <div className="plan-name-row"><input className="plan-name" aria-label="Nome del piano" maxLength={120} value={draft.name} onChange={e => editDraft(d => { d.name = e.target.value })} /><span className={`badge ${draft.status === 'assigned' ? 'green' : ''}`}>{draft.status === 'assigned' ? 'Assegnato' : 'Bozza'}</span></div>
       <div className="plan-fields"><label>Paziente<div className="patient-picker"><select aria-label="Paziente del piano" value={draft.patientId ?? ''} onChange={e => editDraft(d => { d.patientId = e.target.value || undefined; d.status = 'draft' })}><option value="">Seleziona un paziente</option>{patients.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select><button className="icon-button" title="Nuovo paziente" aria-label="Nuovo paziente" onClick={() => setModal('patient')}><UserPlus size={19} /></button></div></label><label>Data di inizio<input type="date" aria-label="Data di inizio" value={draft.startsOn} onChange={e => editDraft(d => { d.startsOn = e.target.value })} /></label><label>Data di fine <small>facoltativa</small><input type="date" aria-label="Data di fine" min={draft.startsOn} value={draft.endsOn ?? ''} onChange={e => editDraft(d => { d.endsOn = e.target.value || undefined })} /></label></div>
     </section>

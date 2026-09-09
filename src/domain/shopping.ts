@@ -22,13 +22,16 @@ export function shoppingDays(diet: Diet, from: LocalDate, to: LocalDate): { date
 }
 
 /** Inclusive calendar range; repeats the weekly plan and counts ONE alternative per date. */
-export function generateShoppingList(diet: Diet, from: LocalDate, to: LocalDate, variantByDate: Record<LocalDate, ID> = {}): ShoppingItem[] {
+export function generateShoppingList(diet: Diet, from: LocalDate, to: LocalDate, variantByDate: Record<LocalDate, ID> = {}, portionChoices: Record<LocalDate, Record<ID, ID>> = {}): ShoppingItem[] {
   const aggregated = new Map<ID, ShoppingItem>()
   for (const { date, day } of shoppingDays(diet, from, to)) {
     const chosen = variantByDate[date] ?? day.defaultVariantId
     const variant = day.variants.find(variant => variant.id === chosen)
     if (!variant) throw new Error(`Variante non disponibile per ${date}.`)
-    for (const portion of variant.meals.flatMap(meal => meal.portions)) {
+    for (const primary of variant.meals.flatMap(meal => meal.portions)) {
+      const choice = portionChoices[date]?.[primary.id]
+      const portion = choice ? primary.alternatives?.find(a => a.id === choice) : primary
+      if (!portion) throw new Error(`Alternativa ingrediente non disponibile per ${date}.`)
       const existing = aggregated.get(portion.foodId)
       aggregated.set(portion.foodId, { foodId: portion.foodId, name: portion.foodSnapshot.name, category: portion.foodSnapshot.category, preparation: portion.foodSnapshot.preparation, grams: (existing?.grams ?? 0) + portion.grams })
     }
@@ -44,13 +47,17 @@ export function defaultShoppingRange(diet: Diet, currentDate = today()) {
   return { from, to: diet.endsOn && endDate > diet.endsOn ? diet.endsOn : endDate }
 }
 
-export function createShoppingRecord(diet: Diet, from: LocalDate, to: LocalDate, variants: Record<LocalDate, ID>, existing?: ShoppingList): ShoppingList {
-  const items = generateShoppingList(diet, from, to, variants)
+export function createShoppingRecord(diet: Diet, from: LocalDate, to: LocalDate, variants: Record<LocalDate, ID>, existing?: ShoppingList, portionChoices: Record<LocalDate, Record<ID, ID>> = {}): ShoppingList {
+  const items = generateShoppingList(diet, from, to, variants, portionChoices)
   if (!items.length) throw new Error('Non ci sono alimenti nei giorni selezionati. Compila il piano o scegli un altro intervallo.')
   return {
     id: existing?.id ?? id(), createdAt: existing?.createdAt ?? now(), updatedAt: now(), generationId: id(),
     dietId: diet.id, dietRevision: diet.revision, patientId: diet.patientId, from, to,
     variantByDate: Object.fromEntries(shoppingDays(diet, from, to).map(({ date, day }) => [date, variants[date] ?? day.defaultVariantId])),
     checkedFoodIds: [],
+    portionChoices: Object.fromEntries(shoppingDays(diet, from, to).map(({ date, day }) => {
+      const variant = day.variants.find(v => v.id === (variants[date] ?? day.defaultVariantId))!
+      return [date, Object.fromEntries(variant.meals.flatMap(m => m.portions).filter(p => portionChoices[date]?.[p.id]).map(p => [p.id, portionChoices[date][p.id]]))]
+    })),
   }
 }

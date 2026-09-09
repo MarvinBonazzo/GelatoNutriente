@@ -45,7 +45,7 @@ export const mealNutrients = (meal: Meal) => totalNutrients(meal.portions)
 export const variantNutrients = (variant: DayVariant) => totalNutrients(variant.meals.flatMap(meal => meal.portions))
 
 export function cloneVariant(variant: DayVariant, name: string): DayVariant {
-  return { ...structuredClone(variant), id: id(), name, meals: variant.meals.map(meal => ({ ...structuredClone(meal), id: id(), portions: meal.portions.map(portion => ({ ...structuredClone(portion), id: id() })) })) }
+  return { ...structuredClone(variant), id: id(), name, meals: variant.meals.map(meal => ({ ...structuredClone(meal), id: id(), portions: meal.portions.map(portion => ({ ...structuredClone(portion), id: id(), alternatives: portion.alternatives?.map(a => ({ ...structuredClone(a), id: id() })) })) })) }
 }
 
 export function validateDiet(diet: Diet) {
@@ -68,9 +68,11 @@ export function validateDiet(diet: Diet) {
         unique(meal.id)
         if (!meal.name.trim()) throw new Error('Inserisci il nome di ogni pasto.')
         for (const portion of meal.portions) {
-          unique(portion.id)
-          if (!Number.isFinite(portion.grams) || portion.grams <= 0 || portion.grams > 10000) throw new Error('Le porzioni devono essere maggiori di 0 e non oltre 10.000 g.')
-          validateNutrients(portion.foodSnapshot.per100g)
+          for (const option of [portion, ...(portion.alternatives ?? [])]) {
+            unique(option.id)
+            if (!Number.isFinite(option.grams) || option.grams <= 0 || option.grams > 10000) throw new Error('Le porzioni devono essere maggiori di 0 e non oltre 10.000 g.')
+            validateNutrients(option.foodSnapshot.per100g)
+          }
         }
       }
     }

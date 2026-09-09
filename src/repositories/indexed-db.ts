@@ -1,8 +1,12 @@
+import { validatePatientAnthropometry } from '../domain/anthropometry'
 import Dexie, { type Table } from 'dexie'
 import seedFoods from '../data/foods.json'
 import { now, validateDiet, validateNutrients } from '../domain/diet'
 import { generateShoppingList } from '../domain/shopping'
-import type { Appointment, Backup, Diet, Entity, Food, Measurement, Patient, ShoppingList } from '../domain/models'
+import { validateMeasurement } from '../domain/clinical'
+import { validateAppointment } from '../domain/calendar'
+import type { Appointment, Backup, Diet, Entity, Food, Measurement, Patient, ShoppingList, StudioProfile } from '../domain/models'
+import { cloneImportedPlan, parseBackup, patientSchema, studioSchema } from '../domain/transfer'
 import type { Repositories, Repository } from './contracts'
 
 export class LocalDatabase extends Dexie {
@@ -13,6 +17,7 @@ export class LocalDatabase extends Dexie {
   appointments!: Table<Appointment, string>
   shoppingLists!: Table<ShoppingList, string>
   meta!: Table<{ key: string; value: number }, string>
+  studio!: Table<StudioProfile, string>
 
   constructor(name = 'gelatonutriente-v1') {
     super(name)
@@ -25,15 +30,20 @@ export class LocalDatabase extends Dexie {
       shoppingLists: 'id, dietId, patientId',
       meta: 'key',
     })
+    this.version(2).stores({ studio: 'id' }).upgrade(async transaction => {
+      await transaction.table('diets').toCollection().modify(diet => {
+        if (diet.status === 'assigned') { diet.patientVisible = true; diet.assignedAt = diet.updatedAt }
+      })
+    })
   }
 }
 
-function tableRepository<T extends Entity>(table: Table<T, string>, validate?: (entity: T) => void): Repository<T> {
+function tableRepository<T extends Entity>(table: Table<T, string>, validate?: (entity: T) => void | Promise<void>): Repository<T> {
   return {
     list: () => table.toArray(),
     get: id => table.get(id),
     async save(entity) {
-      validate?.(entity)
+      await validate?.(entity)
       const saved = { ...structuredClone(entity), updatedAt: now() }
       await table.put(saved)
       return saved
@@ -44,14 +54,14 @@ function tableRepository<T extends Entity>(table: Table<T, string>, validate?: (
 
 export function createIndexedDbRepositories(db = new LocalDatabase()): Repositories {
   const repositories: Repositories = {
-    patients: tableRepository(db.patients, patient => { if (!patient.name.trim()) throw new Error('Inserisci il nome del paziente.') }),
+    patients: tableRepository(db.patients, patient => { patientSchema.parse(patient); validatePatientAnthropometry(patient); if (!patient.name.trim()) throw new Error('Inserisci il nome del paziente.') }),
     diets: { ...tableRepository(db.diets), save: diet => repositories.saveDiet(diet) },
     foods: tableRepository(db.foods, food => {
       if (!food.name.trim() || !food.preparation.trim()) throw new Error('Inserisci nome e stato dell’alimento.')
       validateNutrients(food.per100g)
     }),
-    measurements: tableRepository(db.measurements),
-    appointments: tableRepository(db.appointments),
+    measurements: tableRepository(db.measurements, async m => { validateMeasurement(m); if (!await db.patients.get(m.patientId)) throw new Error('Paziente non trovato.') }),
+    appointments: tableRepository(db.appointments, async a => { validateAppointment(a); if (!await db.patients.get(a.patientId)) throw new Error('Paziente non trovato.') }),
     shoppingLists: { ...tableRepository(db.shoppingLists), save: list => repositories.saveShoppingList(list) },
     async initialize() {
       await db.transaction('rw', db.foods, db.meta, async () => {
@@ -82,7 +92,7 @@ export function createIndexedDbRepositories(db = new LocalDatabase()): Repositor
           }
           await db.patients.put({ ...patient, assignedDietId: diet.id, updatedAt: now() })
         }
-        const saved: Diet = { ...structuredClone(diet), name: diet.name.trim(), revision: diet.revision + 1, updatedAt: now() }
+        const saved: Diet = { ...structuredClone(diet), name: diet.name.trim(), revision: diet.revision + 1, updatedAt: now(), ...(diet.status === 'assigned' ? { patientVisible: true, assignedAt: diet.assignedAt ?? now() } : {}) }
         await db.diets.put(saved)
         return saved
       })
@@ -92,7 +102,7 @@ export function createIndexedDbRepositories(db = new LocalDatabase()): Repositor
         const diet = await db.diets.get(list.dietId)
         if (!diet || diet.revision !== list.dietRevision) throw new Error('Il piano è cambiato. Aggiorna la lista prima di salvarla.')
         if (!list.generationId || list.patientId !== diet.patientId) throw new Error('I riferimenti della lista non sono validi.')
-        const items = generateShoppingList(diet, list.from, list.to, list.variantByDate)
+        const items = generateShoppingList(diet, list.from, list.to, list.variantByDate, list.portionChoices)
         if (!items.length) throw new Error('Non ci sono alimenti nell’intervallo selezionato.')
         if (list.checkedFoodIds.some(id => !items.some(item => item.foodId === id))) throw new Error('Una spunta si riferisce a un alimento non presente nella lista.')
         const existing = await db.shoppingLists.where('dietId').equals(diet.id).first()
@@ -108,7 +118,7 @@ export function createIndexedDbRepositories(db = new LocalDatabase()): Repositor
         if (!list || list.generationId !== generationId) throw new Error('La lista è stata rigenerata in un’altra scheda. La pagina verrà aggiornata: riprova sulla nuova lista.')
         const diet = await db.diets.get(list.dietId)
         if (!diet || diet.revision !== list.dietRevision) throw new Error('Il piano è cambiato. Rigenera la lista prima di spuntare gli alimenti.')
-        const items = generateShoppingList(diet, list.from, list.to, list.variantByDate)
+        const items = generateShoppingList(diet, list.from, list.to, list.variantByDate, list.portionChoices)
         if (!items.some(item => item.foodId === foodId)) throw new Error('L’alimento non è più presente nella lista.')
         const ids = new Set(list.checkedFoodIds)
         if (checked) ids.add(foodId)
@@ -119,11 +129,32 @@ export function createIndexedDbRepositories(db = new LocalDatabase()): Repositor
       })
     },
     async exportBackup(): Promise<Backup> {
-      return db.transaction('r', [db.patients, db.diets, db.foods, db.measurements, db.appointments, db.shoppingLists], async () => ({
+      return db.transaction('r', [db.patients, db.diets, db.foods, db.measurements, db.appointments, db.shoppingLists, db.studio], async () => ({
         format: 'gelatonutriente', schemaVersion: 1, exportedAt: now(),
         patients: await db.patients.toArray(), diets: await db.diets.toArray(), foods: await db.foods.toArray(),
-        measurements: await db.measurements.toArray(), appointments: await db.appointments.toArray(), shoppingLists: await db.shoppingLists.toArray(),
+        measurements: await db.measurements.toArray(), appointments: await db.appointments.toArray(), shoppingLists: await db.shoppingLists.toArray(), studio: await repositories.getStudio(),
       }))
+    },
+    async getStudio() { return await db.studio.get('studio') ?? { id: 'studio', name: 'Studio di nutrizione', professional: '', address: '', contact: '', footer: 'GelatoNutriente' } },
+    async saveStudio(profile) { await db.studio.put(studioSchema.parse(profile)) },
+    async importDiet(input, patient) {
+      validateDiet(input)
+      const { diet, foods } = cloneImportedPlan(input)
+      return db.transaction('rw', db.diets, db.patients, db.foods, async () => {
+        if (patient && typeof patient !== 'string') { if (!patient.name.trim()) throw new Error('Inserisci il nome del profilo.'); await db.patients.put(patient) }
+        await db.foods.bulkPut(foods)
+        return repositories.saveDiet({ ...diet, patientId: typeof patient === 'string' ? patient : patient?.id, status: patient ? 'assigned' : 'draft' })
+      })
+    },
+    async restoreBackup(input) {
+      const backup = parseBackup(input)
+      await db.transaction('rw', [db.patients, db.diets, db.foods, db.measurements, db.appointments, db.shoppingLists, db.studio, db.meta], async () => {
+        for (const table of [db.patients, db.diets, db.foods, db.measurements, db.appointments, db.shoppingLists, db.studio]) await table.clear()
+        await db.patients.bulkPut(backup.patients); await db.diets.bulkPut(backup.diets); await db.foods.bulkPut(backup.foods)
+        await db.measurements.bulkPut(backup.measurements); await db.appointments.bulkPut(backup.appointments); await db.shoppingLists.bulkPut(backup.shoppingLists)
+        if (backup.studio) await db.studio.put(backup.studio)
+        await db.meta.put({ key: 'seed-foods-v1', value: 1 })
+      })
     },
   }
   return repositories

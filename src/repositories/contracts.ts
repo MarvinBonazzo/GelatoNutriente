@@ -1,4 +1,4 @@
-import type { Appointment, Backup, Diet, Entity, Food, Measurement, Patient, ShoppingList } from '../domain/models'
+import type { Appointment, Backup, Diet, Entity, Food, Measurement, Patient, ShoppingList, StudioProfile } from '../domain/models'
 
 export interface Repository<T extends Entity> {
   list(): Promise<T[]>
@@ -20,4 +20,8 @@ export interface Repositories {
   saveShoppingList(list: ShoppingList): Promise<ShoppingList>
   setShoppingItemChecked(listId: string, generationId: string, foodId: string, checked: boolean): Promise<ShoppingList>
   exportBackup(): Promise<Backup>
+  restoreBackup(backup: unknown): Promise<void>
+  getStudio(): Promise<StudioProfile>
+  saveStudio(profile: StudioProfile): Promise<void>
+  importDiet(diet: Diet, patient?: Patient | string): Promise<Diet>
 }

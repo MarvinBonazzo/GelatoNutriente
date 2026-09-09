@@ -23,6 +23,21 @@ export interface Patient extends Entity {
   goals: string
   notes: string
   assignedDietId?: ID
+  birthDate?: LocalDate
+  heightCm?: number
+  initialAssessment?: { date: LocalDate; weightKg: number; heightCm: number; waistCm?: number }
+  anthropometryContext?: 'standard' | 'pregnancy' | 'altered-composition'
+  sexForFormula?: 'female' | 'male'
+  targetWeight?: { kg: number; method: 'manual' | 'devine' | 'robinson' | 'miller' | 'bmi'; confirmedAt: Instant }
+  intake?: {
+    preferences: string
+    exclusions: string
+    allergies: string
+    habits: string
+    preferredFoodIds: ID[]
+    excludedFoodIds: ID[]
+  }
+  medications?: { id: ID; activeIngredient: string; product: string; notes: string; active: boolean }[]
 }
 
 export type FoodCategory = 'Cereali' | 'Proteine' | 'Latticini' | 'Legumi' | 'Verdura' | 'Frutta' | 'Grassi e frutta secca' | 'Altro'
@@ -36,13 +51,14 @@ export interface Food extends Entity {
   isCustom: boolean
 }
 
-export interface Portion {
+export interface FoodPortion {
   id: ID
   foodId: ID
   grams: number
   /** Immutable nutritional snapshot at insertion time. */
   foodSnapshot: Pick<Food, 'name' | 'per100g' | 'preparation' | 'category' | 'source'>
 }
+export interface Portion extends FoodPortion { alternatives?: FoodPortion[] }
 
 export interface Meal {
   id: ID
@@ -74,12 +90,15 @@ export interface Diet extends Entity {
   endsOn?: LocalDate
   notes: string
   days: DietDay[]
+  patientVisible?: boolean
+  assignedAt?: Instant
 }
 
 export interface Measurement extends Entity {
   patientId: ID
   date: LocalDate
   weightKg?: number
+  heightCm?: number
   circumferencesCm: {
     waist?: number
     hips?: number
@@ -115,6 +134,7 @@ export interface ShoppingList extends Entity {
   /** One selected alternative for each calendar date. */
   variantByDate: Record<LocalDate, ID>
   checkedFoodIds: ID[]
+  portionChoices?: Record<LocalDate, Record<ID, ID>>
 }
 
 export interface Backup {
@@ -127,4 +147,15 @@ export interface Backup {
   measurements: Measurement[]
   appointments: Appointment[]
   shoppingLists: ShoppingList[]
+  studio?: StudioProfile
+}
+
+export interface StudioProfile {
+  id: 'studio'
+  name: string
+  professional: string
+  address: string
+  contact: string
+  footer: string
+  logoDataUrl?: string
 }

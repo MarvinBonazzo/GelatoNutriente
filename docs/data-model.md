@@ -23,10 +23,18 @@ interface Patient extends Entity {
   goals: string;
   notes: string;
   assignedDietId?: ID;
+  birthDate?: LocalDate;
+  heightCm?: number;
+  initialAssessment?: { date: LocalDate; weightKg: number; heightCm: number; waistCm?: number };
+  anthropometryContext?: "standard" | "pregnancy" | "altered-composition";
+  sexForFormula?: "female" | "male";
+  targetWeight?: { kg: number; method: "manual" | "devine" | "robinson" | "miller" | "bmi"; confirmedAt: Instant };
+  intake?: { preferences: string; exclusions: string; allergies: string; habits: string; preferredFoodIds: ID[]; excludedFoodIds: ID[] };
+  medications?: { id: ID; activeIngredient: string; product: string; notes: string; active: boolean }[];
 }
 ```
 
-Un paziente può avere molti piani in bozza ma uno solo assegnato. L’anagrafica non è un account e non contiene credenziali.
+Un paziente può avere molti piani, con un solo piano corrente assegnato. Le assegnazioni precedenti conservano `patientVisible` per lo storico. L’anagrafica non è un account e non contiene credenziali.
 
 ## Dieta, giorno, variante, pasto e porzione
 
@@ -41,6 +49,8 @@ interface Diet extends Entity {
   endsOn?: LocalDate;
   notes: string;
   days: DietDay[];
+  patientVisible?: boolean;
+  assignedAt?: Instant;
 }
 interface DietDay {
   id: ID;
@@ -59,15 +69,16 @@ interface Meal {
   time?: string; // HH:mm, predisposto per un futuro campo nell’editor
   portions: Portion[];
 }
-interface Portion {
+interface FoodPortion {
   id: ID;
   foodId: ID;
   grams: number;
   foodSnapshot: Pick<Food, "name" | "per100g" | "preparation" | "category" | "source">;
 }
+interface Portion extends FoodPortion { alternatives?: FoodPortion[] }
 ```
 
-Una variante riguarda l’intera giornata: colazione, spuntino, pranzo, merenda e cena. Il paziente sceglie una variante, non una combinazione arbitraria di singoli pasti fra varianti. Se serviranno sostituzioni a livello di alimento, saranno un’estensione distinta.
+Una variante riguarda l’intera giornata: colazione, spuntino, pranzo, merenda e cena. Il paziente sceglie una variante, non una combinazione arbitraria di singoli pasti fra varianti. Le sostituzioni a livello di ingrediente sono in `Portion.alternatives`, ciascuna con grammi e snapshot propri. L’aggregatore conteggia una sola opzione; i totali del piano si riferiscono agli alimenti principali.
 
 Invarianti di `saveDiet`: sette giorni univoci; almeno una variante per giorno; variante principale appartenente al giorno; ID annidati univoci; nomi non vuoti; porzioni maggiori di zero e al massimo 10.000 g; intervallo temporale valido; assegnazione a un paziente esistente. L’assegnazione richiede almeno un alimento nel piano; i giorni non compilati rimangono visibili e non sono riempiti automaticamente.
 
@@ -97,6 +108,7 @@ interface Measurement extends Entity {
   patientId: ID;
   date: LocalDate;
   weightKg?: number;
+  heightCm?: number; // altezza riferita alla data della misura
   circumferencesCm: {
     waist?: number; hips?: number; chest?: number;
     arm?: number; thigh?: number;
@@ -106,7 +118,7 @@ interface Measurement extends Entity {
 }
 ```
 
-Il futuro form richiederà almeno una misura positiva, data e paziente. L’assenza di un valore significa “non rilevato”, non zero. Il componente grafico già predisposto non interpola i punti mancanti e permette la lettura testuale dei dati.
+Form e repository richiedono almeno una misura positiva, non oltre 1.000, una data non futura e un paziente esistente. L’assenza di un valore significa “non rilevato”, non zero. Il componente grafico non interpola i punti mancanti e permette la lettura testuale dei dati.
 
 ## Appuntamento
 
@@ -125,7 +137,7 @@ interface Appointment extends Entity {
 }
 ```
 
-Si memorizza l’istante UTC insieme al fuso di visualizzazione IANA. Il futuro form dovrà gestire esplicitamente le ore ambigue/inesistenti nel cambio dell’ora. Il campo promemoria è una preferenza salvata, non un servizio di notifica già attivo.
+Si memorizza l’istante UTC insieme al fuso IANA del dispositivo di inserimento. Il form e la vista usano il fuso corrente del dispositivo: le ore inesistenti al cambio dell’ora sono rifiutate, quelle duplicate usano la prima occorrenza, indicata nel form. Durata 5–1.440 minuti, anticipo 0–10.080 minuti. Il banner valuta i promemoria mentre l’app è aperta, senza invii. L’ICS esporta istanti UTC, testo escapato, righe UTF-8 ripiegate e VALARM; esclude le note private.
 
 ## Lista della spesa
 
@@ -139,6 +151,7 @@ interface ShoppingList extends Entity {
   to: LocalDate;
   variantByDate: Record<LocalDate, ID>;
   checkedFoodIds: ID[];
+  portionChoices?: Record<LocalDate, Record<ID, ID>>; // porzione principale -> alternativa
 }
 ```
 
@@ -157,7 +170,7 @@ interface Repository<T extends Entity> {
 }
 ```
 
-La facade `Repositories` offre i repository delle sei entità persistenti, `initialize()`, `exportBackup()`, `saveDiet()`, `saveShoppingList()` e `setShoppingItemChecked()`. L’editor usa quest’ultimo per aggiornare il piano, il collegamento del vecchio paziente e il piano precedentemente assegnato in **un’unica transazione**. La revisione passa da 0 a 1 al primo salvataggio e viene incrementata ad ogni scrittura.
+La facade `Repositories` offre i repository delle sei entità persistenti, `initialize()`, `exportBackup()`, `restoreBackup()`, `importDiet()`, `getStudio()`, `saveStudio()`, `saveDiet()`, `saveShoppingList()` e `setShoppingItemChecked()`. L’editor usa `saveDiet` per aggiornare il piano, il collegamento del vecchio paziente e il piano precedentemente assegnato in **un’unica transazione**. La revisione passa da 0 a 1 al primo salvataggio e viene incrementata ad ogni scrittura.
 
 La modifica di una spunta usa una transazione che legge la lista più recente, verifica la generazione e la revisione del piano e modifica soltanto l’alimento richiesto. Questo preserva le spunte su altri alimenti inserite da un’altra scheda. La rigenerazione è un’azione esplicita che sostituisce la lista corrente.
 
@@ -174,3 +187,35 @@ In un futuro backend, una possibile mappatura REST è:
 | Spunte spesa | incluse nella lista | `PATCH /shopping-lists/:id/items/:foodId` con generazione attesa |
 
 Il backend dovrà rispondere con conflitto, ad esempio HTTP 409, quando la revisione è obsoleta, e gestire l’assegnazione nella stessa transazione del salvataggio. Il piano annidato può essere conservato inizialmente come JSON/JSONB oppure normalizzato internamente mantenendo lo stesso contratto applicativo. Autorizzazioni reali e filtri per utente non sono simulabili con il semplice cambio vista locale.
+
+## Intestazione, portabilità e versioni
+
+```ts
+interface StudioProfile {
+  id: "studio";
+  name: string;
+  professional: string;
+  address: string;
+  contact: string;
+  footer: string;
+  logoDataUrl?: string; // PNG o JPEG in base64
+}
+```
+
+Il database mantiene il nome `gelatonutriente-v1` ed è alla versione Dexie 2. La migrazione aggiunge lo store `studio` e marca come visibili i piani assegnati esistenti, senza eliminare record. L’archivio JSON mantiene `schemaVersion: 1`: i nuovi campi sono facoltativi per leggere i backup precedenti.
+
+`Backup` include `format: "gelatonutriente"`, `exportedAt`, array di pazienti, diete, alimenti, misurazioni, appuntamenti e liste spesa, più `studio?`. `parseBackup` valida con Zod, controlla ID e riferimenti, poi applica le regole del dominio. Solo dopo questa verifica `restoreBackup` sostituisce tutte le tabelle in una singola transazione. Le liste rese obsolete da revisioni successive restano ripristinabili e richiedono rigenerazione.
+
+Il file dieta usa `format: "gelatonutriente-plan"`, `schemaVersion: 1` e `diet`. `sharedPlan` rimuove i collegamenti al paziente; `cloneImportedPlan` rigenera tutti gli ID annidati e gli alimenti dagli snapshot, incluse le alternative. L’importazione crea una copia autonoma e, se richiesto, la assegna atomicamente.
+
+L’involucro cifrato è separato dallo schema applicativo: `format: "gelatonutriente-encrypted"`, `version: 1`, `salt`, `iv`, `payload` in base64. AES-GCM 256 autentica il contenuto, PBKDF2 SHA-256 con 210.000 iterazioni deriva la chiave. Il formato non fornisce identità del mittente, autorizzazioni o sincronizzazione.
+
+La visibilità nella vista paziente è un filtro, non un processo di cancellazione: `patientVisible` (fallback allo stato assegnato per record precedenti), scadenza + un anno e misurazioni da oggi meno due anni a oggi. Le date bisestili vengono ricondotte all’ultimo giorno di febbraio. L’archivio dello studio rimane completo.
+
+## Antropometria e compatibilità
+
+`initialAssessment` è il riferimento iniziale scelto dal nutrizionista, con data, peso, altezza e vita facoltativa. Le nuove misurazioni non lo modificano. `measurementsWithBaseline` aggiunge una voce derivata ai grafici senza creare un secondo record IndexedDB; non la aggiunge se esiste già un’osservazione con stessi data, peso, altezza e vita. L’ultima osservazione ponderale viene scelta per data, poi creazione, ignorando pazienti estranei e dati anteriori alla prima visita o futuri.
+
+`bodyMassIndex` usa l’altezza salvata nella specifica misurazione; per i vecchi record senza altezza il BMI resta non disponibile. Le classi si calcolano sul valore non arrotondato. Variazione percentuale = (ultimo peso − peso iniziale) / peso iniziale × 100. Il peso corrispondente all’intervallo standard viene ricavato da 18,5 e 25 moltiplicati per altezza², con estremo superiore escluso. L’obiettivo concordato resta separato da questo intervallo.
+
+I campi sono facoltativi e non introducono nuovi indici: database Dexie v2 e backup schema 1 restano compatibili. Form, repository e ripristino validano i dati iniziali. Il trasferimento della sola dieta continua a escludere l’anagrafica, quindi non include queste informazioni.

@@ -294,3 +294,114 @@ main { padding: 36px 40px 0; max-width: 1500px; margin: 0 auto; min-height: calc
   .patient-plan-actions { flex-direction: column; align-items: stretch; gap: 15px; }
 }
 @media (max-width: 380px) { .shopping-config .form-grid { grid-template-columns: 1fr; } }
+
+/* Patient follow-up, document tools and local transfers. */
+.workspace-label { text-decoration: none; color: inherit; cursor: pointer; }
+.workspace-label:hover { background: #e5eee1; }
+.module-panel { padding: 24px; margin-bottom: 22px; min-width: 0; }
+.module-panel h2 { font: 26px Georgia, serif; margin-bottom: 18px; }
+.module-description { color: var(--muted); line-height: 1.8; margin-bottom: 20px; }
+.module-heading, .editor-extra-actions, .document-actions, .appointment-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.module-heading { margin-bottom: 18px; }
+.module-heading h2 { margin: 0; }
+.module-heading label { min-width: 190px; }
+.editor-extra-actions { justify-content: flex-end; margin-bottom: 18px; }
+.document-actions { justify-content: flex-start; }
+.settings-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 24px; align-items: start; }
+.form-section { border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+.form-section summary { cursor: pointer; font-weight: 600; line-height: 1.5; }
+.form-section[open] summary { margin-bottom: 20px; }
+.inline-check { display: flex; flex-direction: row; align-items: flex-start; gap: 10px; line-height: 1.7; font-weight: 400; }
+.inline-check input { width: 19px; height: 19px; flex: 0 0 19px; margin: 3px 0 0; accent-color: var(--green); }
+.reference-box, .import-review { background: #f3f7ef; padding: 18px; border: 1px solid var(--line); border-radius: 10px; display: grid; gap: 16px; }
+.reference-result { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.reference-result strong { font: 28px Georgia, serif; }
+.import-review { margin-top: 24px; line-height: 1.7; }
+.logo-preview { display: flex; align-items: center; gap: 20px; }
+.logo-preview img { object-fit: contain; width: 100px; height: 80px; background: white; border: 1px solid var(--line); padding: 6px; }
+.medication-card { padding: 16px; border: 1px solid var(--line); border-radius: 8px; line-height: 1.8; overflow-wrap: anywhere; }
+.medication-card header { display: flex; align-items: center; justify-content: space-between; }
+.medication-card p, .medication-card small { display: block; margin: 8px 0; }
+.medication-card small { color: var(--muted); }
+.table-scroll { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: left; }
+.data-table th { color: var(--muted); font-size: 12px; font-weight: 500; }
+.data-table td, .data-table th { border-bottom: 1px solid var(--line); padding: 14px 10px; line-height: 1.7; }
+.data-table td:nth-child(3) { overflow-wrap: anywhere; min-width: 130px; }
+.data-table td:first-child, .data-table td:last-child { white-space: nowrap; }
+.appointment-grid { display: grid; gap: 18px; }
+.appointment-card { padding: 22px; display: flex; align-items: flex-start; gap: 22px; min-width: 0; }
+.appointment-card h2 { font: 24px Georgia, serif; margin-bottom: 12px; overflow-wrap: anywhere; }
+.appointment-card p { color: var(--muted); line-height: 1.7; margin-bottom: 10px; overflow-wrap: anywhere; }
+.appointment-card > div:last-child { min-width: 0; flex: 1; }
+.appointment-date { padding: 14px; border-radius: 10px; background: #edf3e8; min-width: 82px; text-align: center; }
+.appointment-date strong, .appointment-date span { display: block; }
+.appointment-date span { font-size: 13px; margin-top: 8px; color: var(--muted); }
+.appointment-actions { justify-content: flex-start; margin-top: 18px; }
+.calendar-panel header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.calendar-panel h2 { margin: 0; text-transform: capitalize; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.calendar-grid > strong { text-align: center; font-size: 12px; font-weight: 500; color: var(--muted); padding-bottom: 8px; }
+.calendar-grid button { min-height: 52px; border: 1px solid var(--line); border-radius: 8px; display: flex; justify-content: center; align-items: center; gap: 6px; background: #fbfcf8; color: inherit; }
+.calendar-grid button.selected { border-color: var(--green); background: #e1eddd; font-weight: 600; }
+.calendar-grid small { background: var(--green); color: white; border-radius: 10px; padding: 2px 5px; font-size: 10px; }
+.calendar-panel > .text-link { margin-top: 15px; }
+.reminder-banner { display: flex; gap: 15px; flex-wrap: wrap; justify-content: space-between; padding: 16px 20px; margin-bottom: 20px; background: #fff3d8; border: 1px solid #ecd6a5; border-radius: 10px; line-height: 1.7; }
+.portion-block { border-bottom: 1px solid var(--line); }
+.portion-block .portion-row { border-bottom: 0; }
+.ingredient-alternative { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 8px 20px 8px 30px; font-size: 13px; line-height: 1.6; color: #58725c; background: #f8faf4; }
+.ingredient-alternative small { display: block; color: var(--muted); }
+.ingredient-alternative-button { margin: 8px 20px 15px 30px; font-size: 12px; }
+.ingredient-choice { border-top: 1px solid var(--line); padding: 12px 0; font-size: 12px; }
+.ingredient-choice select { font-size: 14px; }
+@media (max-width: 900px) { .settings-grid { grid-template-columns: 1fr; gap: 0; } }
+@media (max-width: 550px) {
+  .module-panel { padding: 18px; }
+  .module-heading { align-items: stretch; flex-direction: column; }
+  .editor-extra-actions { justify-content: flex-start; }
+  .document-actions { width: 100%; }
+  .document-actions .button { flex: 1; }
+  .appointment-card { padding: 16px; gap: 13px; }
+  .appointment-date { min-width: 65px; padding: 10px 7px; font-size: 14px; }
+  .appointment-card h2 { font-size: 21px; }
+  .calendar-grid { gap: 4px; }
+  .calendar-grid button { min-height: 44px; flex-direction: column; gap: 2px; padding: 4px; }
+  .calendar-panel h2 { font-size: 23px; }
+  .form-section { padding: 12px; }
+  .form-stack input, .form-stack select, .form-stack textarea, .ingredient-choice select { font-size: 16px; }
+  .reference-box, .import-review { padding: 13px; }
+  .reminder-banner { padding: 14px; }
+}
+.diet-document-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.reminder-banner > div { display: flex; gap: 10px; align-items: center; }
+.reminder-banner > div > a { flex: 1; }
+.patient-module-links { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0 28px; }
+.patient-view .diet-document-actions { margin-bottom: 18px; }
+.questionnaire-link { margin-top: 16px; }
+.page-heading + .button + .section-tools { margin-top: 22px; }
+.anthropometry { margin: 20px 0; }
+.anthropometry header { margin-bottom: 16px; }
+.anthropometry h3 { font: 25px Georgia, serif; margin-top: 10px; }
+.anthropometry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.anthropometry-grid article { background: #f1f6ed; border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+.anthropometry-grid article > span { display: block; font-size: 13px; color: var(--muted); }
+.anthropometry-grid strong { display: block; font-size: 23px; margin: 10px 0; font-variant-numeric: tabular-nums; }
+.anthropometry small { display: block; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.anthropometry-reference { padding: 17px; border: 1px solid var(--line); border-radius: 10px; margin-top: 14px; line-height: 1.8; font-size: 14px; }
+.anthropometry-reference h4 { font-size: 15px; margin-bottom: 10px; }
+.anthropometry-reference p + p { margin-top: 12px; }
+.clinical-method { margin-top: 18px; color: var(--muted); font-size: 12px; line-height: 1.8; }
+.clinical-method summary { cursor: pointer; }
+.clinical-method p { margin: 12px 0; }
+.baseline-form { border-top: 1px solid var(--line); padding-top: 18px; }
+.baseline-form h3 { margin-bottom: 10px; font-size: 18px; }
+.baseline-form .form-grid { margin-top: 16px; }
+.patient-assessment-link { display: flex; margin-bottom: 16px; }
+@media (max-width: 550px) {
+  .anthropometry-grid { gap: 8px; }
+  .anthropometry-grid article { padding: 12px; }
+  .anthropometry-grid strong { font-size: 19px; }
+  .anthropometry-reference { padding: 13px; }
+}
+.modal:has(.anthropometry) { width: min(800px, calc(100% - 28px)); }
+.modal .anthropometry > header { display: block; }

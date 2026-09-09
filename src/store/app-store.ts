@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { createDiet } from '../domain/diet'
-import type { Diet, Food, Patient, ShoppingList } from '../domain/models'
+import type { Appointment, Diet, Food, Measurement, Patient, ShoppingList, StudioProfile } from '../domain/models'
 import { repositories } from '../repositories'
 
 interface AppState {
@@ -10,7 +10,11 @@ interface AppState {
   diets: Diet[]
   foods: Food[]
   shoppingLists: ShoppingList[]
+  measurements: Measurement[]
+  appointments: Appointment[]
+  studio: StudioProfile
   selectedPatientId: string
+  selectedPatientDietId: string
   draft: Diet
   dirty: boolean
   notice?: string
@@ -24,13 +28,18 @@ interface AppState {
   saveShoppingList: (list: ShoppingList) => Promise<void>
   checkShoppingItem: (listId: string, generationId: string, foodId: string, checked: boolean) => Promise<void>
   selectPatient: (id: string) => void
+  selectPatientDiet: (id: string) => void
   notify: (notice?: string) => void
+  saveMeasurement: (measurement: Measurement) => Promise<void>
+  saveAppointment: (appointment: Appointment) => Promise<void>
+  removeMeasurement: (id: string) => Promise<void>
+  saveStudio: (studio: StudioProfile) => Promise<void>
 }
 
 let initialization: Promise<void> | undefined
 
 export const useAppStore = create<AppState>((set, get) => ({
-  ready: false, patients: [], diets: [], foods: [], shoppingLists: [], selectedPatientId: '', draft: createDiet(), dirty: false,
+  ready: false, patients: [], diets: [], foods: [], shoppingLists: [], measurements: [], appointments: [], studio: { id: 'studio', name: 'Studio di nutrizione', professional: '', address: '', contact: '', footer: 'GelatoNutriente' }, selectedPatientId: '', selectedPatientDietId: '', draft: createDiet(), dirty: false,
   async initialize() {
     if (!initialization) {
       initialization = (async () => {
@@ -48,8 +57,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     await initialization
   },
   async refresh() {
-    const [patients, diets, foods, shoppingLists] = await Promise.all([repositories.patients.list(), repositories.diets.list(), repositories.foods.list(), repositories.shoppingLists.list()])
-    set({ patients, diets, shoppingLists, foods: foods.sort((a, b) => a.name.localeCompare(b.name, 'it')) })
+    const [patients, diets, foods, shoppingLists, measurements, appointments, studio] = await Promise.all([repositories.patients.list(), repositories.diets.list(), repositories.foods.list(), repositories.shoppingLists.list(), repositories.measurements.list(), repositories.appointments.list(), repositories.getStudio()])
+    set({ patients, diets, shoppingLists, measurements, appointments, studio, foods: foods.sort((a, b) => a.name.localeCompare(b.name, 'it')) })
   },
   editDraft(change) {
     const draft = structuredClone(get().draft)
@@ -73,6 +82,11 @@ export const useAppStore = create<AppState>((set, get) => ({
     await repositories.setShoppingItemChecked(listId, generationId, foodId, checked)
     await get().refresh()
   },
-  selectPatient(selectedPatientId) { set({ selectedPatientId }) },
+  selectPatient(selectedPatientId) { set({ selectedPatientId, selectedPatientDietId: '' }) },
+  selectPatientDiet(selectedPatientDietId) { set({ selectedPatientDietId }) },
   notify(notice) { set({ notice }) },
+  async saveMeasurement(m) { await repositories.measurements.save(m); await get().refresh(); set({ notice: 'Misurazione salvata.' }) },
+  async removeMeasurement(id) { await repositories.measurements.remove(id); await get().refresh(); set({ notice: 'Misurazione eliminata.' }) },
+  async saveAppointment(a) { await repositories.appointments.save(a); await get().refresh(); set({ notice: 'Appuntamento salvato.' }) },
+  async saveStudio(studio) { await repositories.saveStudio(studio); await get().refresh(); set({ notice: 'Intestazione dello studio salvata.' }) },
 }))
