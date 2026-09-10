@@ -8,7 +8,7 @@ import { format } from '../components/NutrientSummary'
 import { bodyMassIndex } from '../domain/anthropometry'
 import { Modal } from '../components/Modal'
 import { PatientForm } from '../components/PatientForm'
-import { estimateEnergyNeeds } from '../domain/clinical'
+import { resolveEnergyTarget } from '../domain/clinical'
 
 export function Patients() {
   const { patients, diets, draft, dirty, setDraft, studio, foods, measurements, notify, selectPatient } = useAppStore()
@@ -28,8 +28,7 @@ export function Patients() {
   const results = patients.filter(p => p.name.toLocaleLowerCase('it').includes(search.toLocaleLowerCase('it')))
   const energyByPatient = new Map<string, { kcal: number; label: string }>()
   for (const patient of results) {
-    if (patient.energyProfile?.targetKcal) energyByPatient.set(patient.id, { kcal: patient.energyProfile.targetKcal, label: 'Obiettivo energetico confermato' })
-    else try { energyByPatient.set(patient.id, { kcal: estimateEnergyNeeds(patient, measurements).maintenanceKcal, label: 'Mantenimento giornaliero stimato' }) }
+    try { const result = resolveEnergyTarget(patient, measurements); energyByPatient.set(patient.id, { kcal: result.targetKcal, label: result.manualOverride ? 'Obiettivo energetico modificato' : `Fabbisogno · ${result.methodLabel}` }) }
     catch { /* La scheda paziente indica quali dati mancano. */ }
   }
   return <>

@@ -11,9 +11,10 @@ import { Modal } from '../components/Modal'
 import { PatientForm } from '../components/PatientForm'
 import { DietActions } from '../components/DietActions'
 import { DietGenerator } from '../components/DietGenerator'
+import { resolveEnergyTarget } from '../domain/clinical'
 
 export function DietEditor() {
-  const { draft, dirty, diets, patients, foods, editDraft, setDraft, saveDraft } = useAppStore()
+  const { draft, dirty, diets, patients, foods, measurements, editDraft, setDraft, saveDraft } = useAppStore()
   const [weekday, setWeekday] = useState(0)
   const [variantId, setVariantId] = useState('')
   const [mealId, setMealId] = useState('')
@@ -25,6 +26,8 @@ export function DietEditor() {
   const variant = day.variants.find(v => v.id === variantId) ?? day.variants.find(v => v.id === day.defaultVariantId) ?? day.variants[0]
   const activeMeal = variant.meals.find(m => m.id === mealId) ?? variant.meals[0]
   const activePatient = patients.find(p => p.id === draft.patientId)
+  let activeTargetKcal: number | undefined
+  try { if (activePatient) activeTargetKcal = resolveEnergyTarget(activePatient, measurements).targetKcal } catch { /* Missing inputs are explained in the patient form. */ }
   const filledDays = draft.days.filter(day => day.variants.some(v => v.meals.some(m => m.portions.length))).length
   function updateVariant(change: (variant: DayVariant) => void) {
     editDraft(d => change(d.days.find(d => d.id === day.id)!.variants.find(v => v.id === variant.id)!))
@@ -78,7 +81,7 @@ export function DietEditor() {
       <div className="day-heading"><div><h2>{weekdays[weekday]}</h2><span>{variant.meals.length} pasti · {day.variants.length} {day.variants.length === 1 ? 'variante' : 'varianti'}</span></div><label className="copy-day"><Copy size={15} /><select aria-label="Copia giornata in" value="" onChange={e => copyDay(Number(e.target.value))}><option value="" disabled>Copia giornata in…</option>{weekdays.map((name, i) => i !== weekday && <option value={i} key={name}>{name}</option>)}</select></label></div>
       <div className="variant-bar"><div className="variant-tabs" aria-label="Varianti del giorno">{day.variants.map(v => <button key={v.id} aria-pressed={variant.id === v.id} className={variant.id === v.id ? 'active' : ''} onClick={() => { setVariantId(v.id); setMealId('') }}>{v.id === day.defaultVariantId && <Check size={13} />}{v.name}</button>)}<button className="variant-add" onClick={duplicateVariant}><Plus size={15} />Variante</button></div></div>
       <div className="variant-meta"><label><span className="sr-only">Nome variante</span><input aria-label="Nome variante" maxLength={60} value={variant.name} onChange={e => updateVariant(v => { v.name = e.target.value })} /></label>{variant.id !== day.defaultVariantId ? <button className="text-link" onClick={() => editDraft(d => { d.days.find(d => d.id === day.id)!.defaultVariantId = variant.id })}>Usa come principale</button> : <span><CheckCheck size={14} />Principale</span>}{day.variants.length > 1 && <button className="icon-button" aria-label="Elimina variante" onClick={() => { if (!window.confirm(`Eliminare la variante “${variant.name}” e i suoi pasti?`)) return; editDraft(d => { const current = d.days.find(d => d.id === day.id)!; current.variants = current.variants.filter(v => v.id !== variant.id); if (current.defaultVariantId === variant.id) current.defaultVariantId = current.variants[0].id }); setVariantId(''); setMealId('') }}><Trash2 size={15} /></button>}</div>
-      <NutrientSummary nutrients={variantNutrients(variant)} targetKcal={activePatient?.energyProfile?.targetKcal} macroTargets={activePatient?.energyProfile?.macroTargets} />
+      <NutrientSummary nutrients={variantNutrients(variant)} targetKcal={activeTargetKcal} macroTargets={activePatient?.energyProfile?.macroTargets} />
       <DayCard day={day} variantId={variant.id} activeMealId={activeMeal?.id} onChangeMeal={changeMeal} onSelectMeal={id => { setMealId(id); if (window.matchMedia('(max-width: 1100px)').matches) document.getElementById('food-catalog')?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} onRemoveMeal={id => { const meal = variant.meals.find(m => m.id === id)!; if (meal.portions.length && !window.confirm(`Eliminare ${meal.name} e i suoi alimenti?`)) return; updateVariant(v => { v.meals = v.meals.filter(m => m.id !== id) }) }} />
       <button className="add-meal" onClick={() => { setMealName(''); setModal('meal') }}><Plus size={17} />Aggiungi un pasto</button>
       <label className="plan-notes">Note per il paziente<textarea rows={3} maxLength={5000} value={draft.notes} placeholder="Indicazioni, sostituzioni e consigli da accompagnare al piano…" onChange={e => editDraft(d => { d.notes = e.target.value })} /></label>

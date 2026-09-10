@@ -152,6 +152,27 @@ main { padding: 36px 40px 0; max-width: 1500px; margin: 0 auto; min-height: calc
 .energy-estimate span { color: var(--muted); font-size: 12px; line-height: 1.5; }
 .energy-estimate strong { font: 24px Georgia, serif; color: #365f49; }
 .energy-estimate > small { grid-column: 1 / -1; color: var(--muted); line-height: 1.6; }
+.energy-result { display: grid; gap: 14px; padding: 17px; border: 1px solid #d8e6da; border-radius: 12px; background: #f8fbf6; }
+.energy-result-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; }
+.energy-result-heading > div { display: grid; gap: 4px; }
+.energy-result-heading span { color: var(--muted); font-size: 12px; }
+.energy-result-heading a { color: var(--green); font-size: 13px; }
+.energy-result code { white-space: normal; color: #496251; background: #edf4ed; border-radius: 7px; padding: 10px 12px; line-height: 1.6; }
+.energy-result .energy-estimate { grid-template-columns: repeat(3, 1fr); padding: 0; border: 0; background: transparent; }
+.energy-result .button { justify-self: start; }
+.energy-reset { justify-self: start; }
+.energy-comparison { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.energy-comparison > summary { cursor: pointer; padding: 14px 16px; font-weight: 600; color: #48624f; background: #f4f7f0; }
+.energy-method-list { display: grid; }
+.energy-method-list article { display: grid; grid-template-columns: minmax(180px, .9fr) minmax(220px, 1.4fr) auto; gap: 14px; align-items: center; padding: 13px 16px; border-top: 1px solid var(--line); }
+.energy-method-list article.selected { box-shadow: inset 3px 0 var(--green); background: #f7faf4; }
+.energy-method-list article > div { display: grid; gap: 5px; }
+.energy-method-list span, .energy-method-list small { color: var(--muted); font-size: 12px; line-height: 1.45; }
+.energy-method-value strong { font-variant-numeric: tabular-nums; color: #365f49; }
+.energy-method-missing { color: #8b684f !important; }
+.energy-method-list .text-link { white-space: nowrap; }
+.energy-method-actions { display: flex !important; align-items: center; justify-content: flex-end; gap: 10px !important; }
+.energy-method-actions a { color: var(--green); font-size: 12px; }
 .macro-target-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
 .macro-total { margin-top: 12px; font-size: 13px; }
 .macro-total.valid { color: #36704d; }
@@ -382,8 +403,10 @@ main { padding: 36px 40px 0; max-width: 1500px; margin: 0 auto; min-height: calc
   .form-section { padding: 12px; }
   .form-stack input, .form-stack select, .form-stack textarea, .ingredient-choice select { font-size: 16px; }
   .reference-box, .import-review { padding: 13px; }
-  .energy-estimate, .macro-target-grid { grid-template-columns: 1fr; }
+  .energy-estimate, .energy-result .energy-estimate, .macro-target-grid { grid-template-columns: 1fr; }
   .energy-estimate > small { grid-column: 1; }
+  .energy-method-list article { grid-template-columns: 1fr; align-items: start; }
+  .energy-method-actions { justify-content: flex-start; }
   .reminder-banner { padding: 14px; }
 }
 .diet-document-actions { display: flex; gap: 10px; flex-wrap: wrap; }

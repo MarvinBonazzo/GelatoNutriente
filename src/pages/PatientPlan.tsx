@@ -5,11 +5,11 @@ import { DayCard } from '../components/DayCard'
 import { NutrientSummary } from '../components/NutrientSummary'
 import { variantNutrients, weekdays } from '../domain/diet'
 import { useAppStore } from '../store/app-store'
-import { addYears, patientDiets } from '../domain/clinical'
+import { addYears, patientDiets, resolveEnergyTarget } from '../domain/clinical'
 import { DietActions } from '../components/DietActions'
 
 export function PatientPlan({ preview = false }: { preview?: boolean }) {
-  const { draft, patients, diets, selectedPatientId, selectPatient, selectedPatientDietId, selectPatientDiet } = useAppStore()
+  const { draft, patients, diets, measurements, selectedPatientId, selectPatient, selectedPatientDietId, selectPatientDiet } = useAppStore()
   const [weekday, setWeekday] = useState((new Date().getDay() + 6) % 7)
   const [variantId, setVariantId] = useState('')
   const patient = patients.find(p => p.id === selectedPatientId) ?? patients[0]
@@ -17,6 +17,8 @@ export function PatientPlan({ preview = false }: { preview?: boolean }) {
   const diet = preview ? draft : available.find(d => d.id === selectedPatientDietId) ?? available.find(d => d.id === patient?.assignedDietId) ?? available[0]
   const day = diet?.days.find(d => d.weekday === weekday)
   const variant = day?.variants.find(v => v.id === variantId) ?? day?.variants.find(v => v.id === day.defaultVariantId)
+  let targetKcal: number | undefined
+  try { if (patient) targetKcal = resolveEnergyTarget(patient, measurements).targetKcal } catch { /* Missing inputs are explained in the patient form. */ }
   return <div className="patient-view">
     <Link to="/piani" className="text-link"><ArrowLeft size={17} />Torna ai piani</Link>
     {preview ? <div className="info-banner">Anteprima del piano aperto, incluse le modifiche non ancora salvate.</div> : <div className="info-banner">Vista paziente locale · Usa lo stesso archivio del nutrizionista, in questo browser.</div>}
@@ -31,7 +33,7 @@ export function PatientPlan({ preview = false }: { preview?: boolean }) {
       <div className="week-tabs" role="tablist" aria-label="Giorni della dieta">{weekdays.map((name, i) => <button key={name} role="tab" aria-selected={weekday === i} className={weekday === i ? 'active' : ''} onClick={() => { setWeekday(i); setVariantId('') }}><span>{name}</span></button>)}</div>
       <div className="day-heading"><h2>{weekdays[weekday]}</h2><span>{variant.meals.length} pasti</span></div>
       {day.variants.length > 1 && <label className="variant-selector">Scegli una delle alternative della giornata<select value={variant.id} onChange={e => setVariantId(e.target.value)}>{day.variants.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}</select></label>}
-      <NutrientSummary nutrients={variantNutrients(variant)} targetKcal={patient?.energyProfile?.targetKcal} macroTargets={patient?.energyProfile?.macroTargets} />
+      <NutrientSummary nutrients={variantNutrients(variant)} targetKcal={targetKcal} macroTargets={patient?.energyProfile?.macroTargets} />
       <DayCard day={day} variantId={variant.id} readOnly />
       {diet.notes && <section className="panel patient-notes"><h2>Note del piano</h2><p>{diet.notes}</p></section>}
     </>}

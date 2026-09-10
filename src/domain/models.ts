@@ -32,6 +32,11 @@ export interface Patient extends Entity {
   energyProfile?: {
     activityLevel?: 'low' | 'moderate' | 'active' | 'very-active'
     goal?: 'lose' | 'maintain' | 'gain'
+    calculationMethod?: 'mifflin' | 'harris-original' | 'harris-revised' | 'schofield' | 'owen' | 'cunningham' | 'katch-mcardle' | 'indirect-calorimetry' | 'kcal-per-kg'
+    bodyFatPercent?: number
+    measuredRestingKcal?: number
+    kcalPerKg?: number
+    adjustmentKcal?: number
     targetKcal?: number
     macroTargets?: { carbsPercent: number; proteinPercent: number; fatPercent: number }
   }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import seed from '../data/foods.json'
-import { addYears, ageOnDate, estimateEnergyNeeds, patientDiets, recentMeasurements, referenceWeight, validateMeasurement } from './clinical'
+import { addYears, ageOnDate, compareEnergyMethods, energyMethods, estimateEnergyNeeds, patientDiets, recentMeasurements, referenceWeight, resolveEnergyTarget, validateMeasurement } from './clinical'
 import { appointmentIcs, dueAppointments, validateAppointment } from './calendar'
 import { cloneImportedPlan, decodeTransfer, encryptTransfer, parseSharedPlan, sharedPlan } from './transfer'
 import { createDiet, createPortion, cloneVariant, id, now, variantNutrients } from './diet'
@@ -36,6 +36,33 @@ describe('clinical reference and archive windows', () => {
     expect(() => estimateEnergyNeeds({ ...complete, birthDate: '2010-01-01' }, [], '2026-09-10')).toThrow('19 anni')
     expect(() => estimateEnergyNeeds({ ...complete, anthropometryContext: 'pregnancy' })).toThrow('gravidanza')
     expect(() => estimateEnergyNeeds({ ...complete, energyProfile: undefined })).toThrow('attività')
+  })
+  it('calcola e rende confrontabili tutte le equazioni energetiche supportate', () => {
+    const base = { ...person, initialAssessment: { date: '2026-01-01', weightKg: 75, heightCm: 177.8 }, energyProfile: { activityLevel: 'moderate' as const, goal: 'maintain' as const, bodyFatPercent: 20, measuredRestingKcal: 1600, kcalPerKg: 30 } }
+    expect(energyMethods).toHaveLength(9)
+    expect(estimateEnergyNeeds({ ...base, energyProfile: { ...base.energyProfile, calculationMethod: 'harris-original' } }, [], '2026-09-10').restingKcal).toBeCloseTo(1676.7, 1)
+    expect(estimateEnergyNeeds({ ...base, energyProfile: { ...base.energyProfile, calculationMethod: 'harris-revised' } }, [], '2026-09-10').restingKcal).toBeCloseTo(1685.26, 1)
+    expect(estimateEnergyNeeds({ ...base, energyProfile: { ...base.energyProfile, calculationMethod: 'schofield' } }, [], '2026-09-10').restingKcal).toBeCloseTo(1733.5, 1)
+    expect(estimateEnergyNeeds({ ...base, energyProfile: { ...base.energyProfile, calculationMethod: 'owen' } }, [], '2026-09-10').restingKcal).toBeCloseTo(1644)
+    expect(estimateEnergyNeeds({ ...base, energyProfile: { ...base.energyProfile, calculationMethod: 'cunningham' } }, [], '2026-09-10').restingKcal).toBeCloseTo(1820)
+    expect(estimateEnergyNeeds({ ...base, energyProfile: { ...base.energyProfile, calculationMethod: 'katch-mcardle' } }, [], '2026-09-10').restingKcal).toBeCloseTo(1666)
+    expect(estimateEnergyNeeds({ ...base, energyProfile: { ...base.energyProfile, calculationMethod: 'indirect-calorimetry' } }, [], '2026-09-10').dailyKcal).toBeCloseTo(2560)
+    const perKg = estimateEnergyNeeds({ ...base, energyProfile: { ...base.energyProfile, activityLevel: undefined, calculationMethod: 'kcal-per-kg' } }, [], '2026-09-10')
+    expect(perKg.dailyKcal).toBe(2250)
+    expect(perKg.restingKcal).toBeUndefined()
+    expect(compareEnergyMethods(base, [], '2026-09-10').every(item => item.estimate)).toBe(true)
+  })
+  it('mantiene distinti calcolo, correzione professionale e obiettivo manuale', () => {
+    const profile = { ...person, initialAssessment: { date: '2026-01-01', weightKg: 75, heightCm: 177.8 }, energyProfile: { activityLevel: 'moderate' as const, goal: 'lose' as const, adjustmentKcal: -300 } }
+    const adjusted = estimateEnergyNeeds(profile, [], '2026-09-10')
+    expect(adjusted.calculatedTargetKcal).toBeCloseTo(adjusted.dailyKcal - 300)
+    expect(adjusted.manualOverride).toBe(false)
+    const manual = estimateEnergyNeeds({ ...profile, energyProfile: { ...profile.energyProfile, targetKcal: 2100 } }, [], '2026-09-10')
+    expect(manual.calculatedTargetKcal).toBeCloseTo(adjusted.calculatedTargetKcal)
+    expect(manual.targetKcal).toBe(2100)
+    expect(manual.manualOverride).toBe(true)
+    expect(resolveEnergyTarget({ ...person, birthDate: undefined, energyProfile: { targetKcal: 2100 } }).targetKcal).toBe(2100)
+    expect(() => estimateEnergyNeeds({ ...profile, energyProfile: { ...profile.energyProfile, calculationMethod: 'cunningham' } }, [], '2026-09-10')).toThrow('massa grassa')
   })
   it('calculates published reference equations for ten inches above five feet', () => {
     expect(referenceWeight(person, 'devine')).toBeCloseTo(73)

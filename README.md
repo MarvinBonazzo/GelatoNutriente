@@ -1,6 +1,6 @@
 # GelatoNutriente
 
-Web app personale in italiano per organizzare piani alimentari. Frontend statico, senza account o backend, predisposto per GitHub Pages. La versione **0.3** comprende editor diete, pazienti, misurazioni, appuntamenti, documenti PDF e trasferimento dei dati tramite file. “Spazio personale” apre **Studio e file**.
+Web app personale in italiano per organizzare piani alimentari. Frontend statico, senza account o backend, predisposto per GitHub Pages. La versione **0.5** comprende editor diete, pazienti, calcolo energetico multi-metodo, misurazioni, appuntamenti, documenti PDF e trasferimento dei dati tramite file. “Spazio personale” apre **Studio e file**.
 
 ## Stack scelto
 
@@ -37,15 +37,15 @@ npm run preview    # Anteprima della build, normalmente sulla porta 4173
 7. **Salvataggio e assegnazione**: “Salva piano” conserva i dati nel browser. “Assegna piano” rende il piano disponibile nella vista paziente locale. Ogni paziente ha un solo piano corrente; i piani precedentemente assegnati rimangono consultabili nello storico paziente entro il periodo di visibilità.
 8. **Vista paziente**: consulta il piano assegnato, cambia giorno e visualizza una variante alternativa. “Anteprima paziente” nell’editor mostra invece la bozza aperta, comprese le modifiche non salvate.
 9. **Lista della spesa**: scegli un piano salvato, un intervallo di date e una variante per ciascuna data. Genera la lista e spunta gli alimenti acquistati: le spunte vengono salvate automaticamente. Nella vista paziente trovi il pulsante “Lista della spesa” accanto al periodo del piano.
-10. **Fabbisogno e questionario**: la scheda paziente stima metabolismo a riposo e mantenimento da età, sesso, peso, altezza e PAL; raccoglie 14 aree di anamnesi e consente al professionista di confermare kcal e ripartizione macro.
-11. **Compila settimana**: crea una bozza fissa o con due varianti al giorno, proponendo l’obiettivo kcal confermato o la stima di mantenimento. Rispetta le esclusioni selezionate e favorisce le preferenze compatibili. Non interpreta automaticamente allergie o testo libero: serve una revisione prima dell’assegnazione.
-11. **Alternative per ingrediente**: aggiungi un sostituto con porzione propria nel pasto. Nella spesa si sceglie per data l’alimento effettivamente acquistato; PDF e vista paziente mostrano tutte le opzioni. I totali nell’editor e nel PDF si riferiscono agli alimenti principali, senza sommare sostituti.
-12. **Misurazioni**: inserimento, modifica, eliminazione, grafico e tabella di peso e cinque circonferenze, in entrambe le viste.
-13. **Appuntamenti**: calendario mensile, inserimento/modifica/stato, prossimi incontri, promemoria nell’app e download `.ics` con allarme. Nessun messaggio viene inviato automaticamente.
-14. **Questionario e riferimenti di peso**: preferenze, esclusioni, allergie, abitudini, formule Devine/Robinson/Miller e BMI scelto, con conferma esplicita del peso obiettivo. Questionario PDF vuoto o compilato.
-15. **Farmaci e metabolismo**: schede informative per tre principi attivi verificati, con fonte e data. I principi attivi non coperti sono segnalati esplicitamente.
-16. **PDF dieta**: formato classico (ogni giorno inizia su un foglio) o compatto (più giorni per foglio), con logo PNG/JPEG e intestazione dello studio. Documenti lunghi continuano su altre pagine.
-17. **Studio e file**: esportazione cifrata dell’archivio, importazione con anteprima e conferma di sostituzione, condivisione della sola dieta come copia indipendente. È ancora disponibile l’esportazione JSON non cifrata; nessuna esportazione include modifiche non salvate, salvo le azioni sul piano aperto che esportano esplicitamente la bozza.
+10. **Fabbisogno e questionario**: la scheda paziente confronta 9 metodi energetici — Mifflin–St Jeor, Harris–Benedict originale e rivista, Schofield, Owen, Cunningham, Katch–McArdle, calorimetria indiretta e kcal/kg — mostrando algoritmo, dati necessari e fonte. Il professionista può applicare una correzione, modificare il risultato finale, impostare i macro e raccogliere 14 aree di anamnesi.
+11. **Compila settimana**: crea una bozza fissa o con due varianti al giorno, proponendo l’obiettivo kcal manuale oppure il risultato del metodo selezionato. Rispetta le esclusioni selezionate e favorisce le preferenze compatibili. Non interpreta automaticamente allergie o testo libero: serve una revisione prima dell’assegnazione.
+12. **Alternative per ingrediente**: aggiungi un sostituto con porzione propria nel pasto. Nella spesa si sceglie per data l’alimento effettivamente acquistato; PDF e vista paziente mostrano tutte le opzioni. I totali nell’editor e nel PDF si riferiscono agli alimenti principali, senza sommare sostituti.
+13. **Misurazioni**: inserimento, modifica, eliminazione, grafico e tabella di peso e cinque circonferenze, in entrambe le viste.
+14. **Appuntamenti**: calendario mensile, inserimento/modifica/stato, prossimi incontri, promemoria nell’app e download `.ics` con allarme. Nessun messaggio viene inviato automaticamente.
+15. **Questionario e riferimenti di peso**: preferenze, esclusioni, allergie, abitudini, formule Devine/Robinson/Miller e BMI scelto, con conferma esplicita del peso obiettivo. Questionario PDF vuoto o compilato.
+16. **Farmaci e metabolismo**: schede informative per tre principi attivi verificati, con fonte e data. I principi attivi non coperti sono segnalati esplicitamente.
+17. **PDF dieta**: formato classico (ogni giorno inizia su un foglio) o compatto (più giorni per foglio), con logo PNG/JPEG e intestazione dello studio. Documenti lunghi continuano su altre pagine.
+18. **Studio e file**: esportazione cifrata dell’archivio, importazione con anteprima e conferma di sostituzione, condivisione della sola dieta come copia indipendente. È ancora disponibile l’esportazione JSON non cifrata; nessuna esportazione include modifiche non salvate, salvo le azioni sul piano aperto che esportano esplicitamente la bozza.
 
 Il primo avvio inserisce soltanto gli alimenti. Nessun paziente o piano personale viene creato automaticamente. “Carica esempio” prepara, su richiesta, un esempio dimostrativo limitato al lunedì: gli altri giorni restano da compilare. Non è una proposta alimentare da seguire.
 

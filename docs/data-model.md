@@ -32,6 +32,12 @@ interface Patient extends Entity {
   energyProfile?: {
     activityLevel?: "low" | "moderate" | "active" | "very-active";
     goal?: "lose" | "maintain" | "gain";
+    calculationMethod?: "mifflin" | "harris-original" | "harris-revised" | "schofield" | "owen"
+      | "cunningham" | "katch-mcardle" | "indirect-calorimetry" | "kcal-per-kg";
+    bodyFatPercent?: number;
+    measuredRestingKcal?: number;
+    kcalPerKg?: number;
+    adjustmentKcal?: number;
     targetKcal?: number;
     macroTargets?: { carbsPercent: number; proteinPercent: number; fatPercent: number };
   };
@@ -42,7 +48,9 @@ interface Patient extends Entity {
 
 Un paziente può avere molti piani, con un solo piano corrente assegnato. Le assegnazioni precedenti conservano `patientVisible` per lo storico. L’anagrafica non è un account e non contiene credenziali.
 
-Il mantenimento energetico è una stima per adulti: dispendio a riposo Mifflin–St Jeor moltiplicato per il PAL selezionato (1,4–2,0). Il deficit o surplus non viene applicato automaticamente. La kcal-obiettivo e la ripartizione macro sono valori separati, confermati dal nutrizionista; le tre percentuali devono totalizzare 100.
+Il fabbisogno energetico è una stima per adulti. Il metodo predefinito è Mifflin–St Jeor; sono selezionabili anche Harris–Benedict originale e rivista, Schofield, Owen, Cunningham, Katch–McArdle, calorimetria indiretta e coefficiente kcal/kg. Le equazioni predittive e la misura a riposo sono moltiplicate per il PAL selezionato (1,4–2,0); kcal/kg produce direttamente la stima giornaliera. Cunningham e Katch–McArdle richiedono la percentuale di massa grassa, mentre la calorimetria richiede il valore misurato.
+
+`adjustmentKcal` è una correzione con segno decisa dal professionista e genera il risultato calcolato. `targetKcal`, se valorizzato, è un override manuale e diventa il valore usato da riepiloghi e generatore. Il deficit o surplus non deriva automaticamente dal campo `goal`. La ripartizione macro è separata e le tre percentuali devono totalizzare 100.
 
 ## Dieta, giorno, variante, pasto e porzione
 

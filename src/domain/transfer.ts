@@ -27,6 +27,8 @@ export const patientSchema = z.object({
   targetWeight: z.object({ kg: z.number().positive().max(1000), method: z.enum(['manual', 'devine', 'robinson', 'miller', 'bmi']), confirmedAt: instant }).optional(),
   energyProfile: z.object({
     activityLevel: z.enum(['low', 'moderate', 'active', 'very-active']).optional(), goal: z.enum(['lose', 'maintain', 'gain']).optional(), targetKcal: z.number().positive().max(10000).optional(),
+    calculationMethod: z.enum(['mifflin', 'harris-original', 'harris-revised', 'schofield', 'owen', 'cunningham', 'katch-mcardle', 'indirect-calorimetry', 'kcal-per-kg']).optional(),
+    bodyFatPercent: z.number().positive().max(75).optional(), measuredRestingKcal: z.number().min(200).max(10000).optional(), kcalPerKg: z.number().min(5).max(100).optional(), adjustmentKcal: z.number().min(-3000).max(3000).optional(),
     macroTargets: z.object({ carbsPercent: z.number().min(0).max(100), proteinPercent: z.number().min(0).max(100), fatPercent: z.number().min(0).max(100) }).refine(v => Math.abs(v.carbsPercent + v.proteinPercent + v.fatPercent - 100) < .01, 'Le percentuali dei macronutrienti devono totalizzare 100.').optional(),
   }).optional(),
   intake: z.object({ preferences: text, exclusions: text, allergies: text, habits: text, mealsAndSchedule: text.optional(), workAndActivity: text.optional(), cookingAndBudget: text.optional(), hydration: text.optional(), sleepAndStress: text.optional(), digestion: text.optional(), conditions: text.optional(), supplements: text.optional(), alcoholAndSmoking: text.optional(), dietHistory: text.optional(), preferredFoodIds: z.array(identifier), excludedFoodIds: z.array(identifier) }).optional(),

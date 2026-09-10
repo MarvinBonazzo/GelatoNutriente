@@ -2,11 +2,12 @@ import { useState } from 'react'
 import { Plus, Trash2 } from 'lucide-react'
 import type { Patient } from '../domain/models'
 import { id, now, today } from '../domain/diet'
-import { energyFormulaSource, energyReferenceSource, estimateEnergyNeeds, referenceWeight, weightFormulaSource, type WeightFormula } from '../domain/clinical'
+import { referenceWeight, weightFormulaSource, type WeightFormula } from '../domain/clinical'
 import { findMedicationEffect, medicationEffects } from '../data/medication-effects'
 import { useAppStore } from '../store/app-store'
 import { AnthropometryPanel } from './AnthropometryPanel'
 import { format } from './NutrientSummary'
+import { EnergyCalculator } from './EnergyCalculator'
 
 export type ClinicalProfile = Pick<Patient, 'initialAssessment' | 'anthropometryContext' | 'birthDate' | 'heightCm' | 'sexForFormula' | 'targetWeight' | 'energyProfile' | 'intake' | 'medications'>
 
@@ -36,13 +37,6 @@ export function ClinicalFields({ value, onChange, patientId }: { patientId?: str
   let calculated: number | undefined; let calculationError = ''
   try { if (value.anthropometryContext && value.anthropometryContext !== 'standard') throw new Error('Riferimenti automatici sospesi nel contesto clinico selezionato. Puoi inserire un obiettivo concordato manualmente.'); calculated = referenceWeight(value, formula, bmi) } catch (e) { calculationError = e instanceof Error ? e.message : 'Completa i dati.' }
   const intake = value.intake ?? { preferences: '', exclusions: '', allergies: '', habits: '', preferredFoodIds: [], excludedFoodIds: [] }
-  const energy = value.energyProfile
-  const macroTargets = energy?.macroTargets
-  const macroTotal = macroTargets ? macroTargets.carbsPercent + macroTargets.proteinPercent + macroTargets.fatPercent : 0
-  let energyEstimate: ReturnType<typeof estimateEnergyNeeds> | undefined; let energyError = ''
-  try { energyEstimate = estimateEnergyNeeds({ ...value, id: patientId ?? 'preview' }, patientId ? measurements : []) }
-  catch (e) { energyError = e instanceof Error ? e.message : 'Completa i dati richiesti.' }
-  const setEnergy = (patch: Partial<NonNullable<Patient['energyProfile']>>) => onChange({ ...value, energyProfile: { ...energy, ...patch } })
   return <>
     <details className="form-section" open><summary>Prima visita, BMI e peso obiettivo</summary><div className="form-stack">
       <div className="form-grid"><label>Data di nascita<input type="date" max={today()} value={value.birthDate ?? ''} onChange={e => onChange({ ...value, birthDate: e.target.value || undefined })} /></label><label>Altezza attuale (cm)<input type="number" min="50" max="250" step="0.1" value={value.heightCm ?? ''} onChange={e => onChange({ ...value, heightCm: e.target.value ? Number(e.target.value) : undefined })} /></label></div>
@@ -62,13 +56,7 @@ export function ClinicalFields({ value, onChange, patientId }: { patientId?: str
       <label>Obiettivo concordato (kg)<input type="number" min="0.1" max="1000" step="0.1" value={value.targetWeight?.kg ?? ''} onChange={e => onChange({ ...value, targetWeight: e.target.value ? { kg: Number(e.target.value), method: 'manual', confirmedAt: now() } : undefined })} /></label>
     </div></details>
 
-    <details className="form-section" open><summary>Fabbisogno calorico e obiettivi giornalieri</summary><div className="form-stack">
-      <div className="form-grid"><label>Livello di attività fisica<select value={energy?.activityLevel ?? ''} onChange={e => setEnergy({ activityLevel: e.target.value ? e.target.value as NonNullable<Patient['energyProfile']>['activityLevel'] : undefined })}><option value="">Da indicare</option><option value="low">Basso / sedentario · PAL 1,4</option><option value="moderate">Moderato · PAL 1,6</option><option value="active">Attivo · PAL 1,8</option><option value="very-active">Molto attivo · PAL 2,0</option></select></label><label>Obiettivo del percorso<select value={energy?.goal ?? ''} onChange={e => setEnergy({ goal: e.target.value ? e.target.value as NonNullable<Patient['energyProfile']>['goal'] : undefined })}><option value="">Da indicare</option><option value="lose">Riduzione del peso</option><option value="maintain">Mantenimento</option><option value="gain">Aumento del peso</option></select></label></div>
-      {energyEstimate ? <div className="energy-estimate"><div><span>Metabolismo a riposo stimato</span><strong>{format(energyEstimate.restingKcal)} kcal</strong></div><div><span>Mantenimento giornaliero stimato</span><strong>{format(energyEstimate.maintenanceKcal)} kcal</strong></div><small>Calcolo su {format(energyEstimate.weightKg, 1)} kg, {format(energyEstimate.heightCm, 1)} cm, {energyEstimate.age} anni e PAL {format(energyEstimate.activityFactor, 1)}.{energyEstimate.olderThanOriginalSample ? ' Età oltre il campione originario della formula: interpretare con particolare cautela.' : ''}</small></div> : <p className="info-banner">Per calcolare le kcal della persona completa data di nascita, sesso, altezza, peso e attività: {energyError}</p>}
-      <label>Obiettivo energetico confermato dal nutrizionista (kcal/giorno)<input type="number" min="1" max="10000" step="1" value={energy?.targetKcal ?? ''} onChange={e => setEnergy({ targetKcal: e.target.value ? Number(e.target.value) : undefined })} /></label>
-      <p className="field-hint">La stima di mantenimento non applica automaticamente deficit o surplus. Usa l’obiettivo confermato dopo anamnesi e monitoraggio. Formula Mifflin–St Jeor per il dispendio a riposo e moltiplicatori PAL: <a href={energyFormulaSource} target="_blank" rel="noreferrer">studio originale</a> · <a href={energyReferenceSource} target="_blank" rel="noreferrer">riferimenti EFSA</a>.</p>
-      <fieldset><legend>Ripartizione energetica obiettivo dei macronutrienti</legend><label className="inline-check"><input type="checkbox" checked={!!macroTargets} onChange={e => setEnergy({ macroTargets: e.target.checked ? { carbsPercent: 45, proteinPercent: 25, fatPercent: 30 } : undefined })} />Imposta percentuali personalizzate</label>{macroTargets && <><div className="macro-target-grid"><label>Carboidrati (%)<input type="number" min="0" max="100" step="1" value={macroTargets.carbsPercent} onChange={e => setEnergy({ macroTargets: { ...macroTargets, carbsPercent: Number(e.target.value) } })} /></label><label>Proteine (%)<input type="number" min="0" max="100" step="1" value={macroTargets.proteinPercent} onChange={e => setEnergy({ macroTargets: { ...macroTargets, proteinPercent: Number(e.target.value) } })} /></label><label>Grassi (%)<input type="number" min="0" max="100" step="1" value={macroTargets.fatPercent} onChange={e => setEnergy({ macroTargets: { ...macroTargets, fatPercent: Number(e.target.value) } })} /></label></div><p className={Math.abs(macroTotal - 100) < .01 ? 'macro-total valid' : 'macro-total invalid'}>Totale: {format(macroTotal, 1)}% {Math.abs(macroTotal - 100) < .01 ? '✓' : '· deve essere 100%'}</p></>}</fieldset>
-    </div></details>
+    <EnergyCalculator patientId={patientId} value={value} onChange={onChange} />
 
     <details className="form-section"><summary>Questionario alimentare e stile di vita · {intakeQuestions.length} domande</summary><div className="form-stack">
       {intakeQuestions.map(([key, label], index) => <label key={key}><span className="question-number">{index + 1}</span>{label}<textarea rows={2} maxLength={3000} value={intake[key] ?? ''} onChange={e => onChange({ ...value, intake: { ...intake, [key]: e.target.value } })} /></label>)}
