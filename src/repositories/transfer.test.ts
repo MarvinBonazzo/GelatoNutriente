@@ -5,9 +5,12 @@ import { createPortion, id, now, sampleDiet } from '../domain/diet'
 import { patientDiets } from '../domain/clinical'
 import { createShoppingRecord } from '../domain/shopping'
 import type { Patient } from '../domain/models'
+import seedFoods from '../data/foods.json'
+import { extraFoods } from '../data/extra-foods'
 let db: LocalDatabase
 let repo: ReturnType<typeof createIndexedDbRepositories>
 const person = (): Patient => ({ id: id(), createdAt: now(), updatedAt: now(), name: 'Profilo test', notes: '', goals: '' })
+const defaultFoodCount = seedFoods.length + extraFoods.length
 beforeEach(async () => { db = new LocalDatabase(`transfer-${id()}`); repo = createIndexedDbRepositories(db); await repo.initialize() })
 afterEach(async () => { vi.restoreAllMocks(); await db.delete() })
 it('round-trips a complete archive including studio, measurements, medicines, appointments and shopping choices', async () => {
@@ -38,7 +41,7 @@ it('rejects malformed and dangling-reference backups before changing the current
   await expect(repo.restoreBackup({ ...backup, patients: [{ ...patient, assignedDietId: 'missing' }] })).rejects.toThrow()
   await expect(repo.restoreBackup({ ...backup, patients: [patient, patient] })).rejects.toThrow()
   expect(await repo.patients.list()).toEqual([patient])
-  expect(await repo.foods.list()).toHaveLength(72)
+  expect(await repo.foods.list()).toHaveLength(defaultFoodCount)
 })
 it('rolls back a failed restore after tables have been cleared', async () => {
   const patient = await repo.patients.save(person())
@@ -46,7 +49,7 @@ it('rolls back a failed restore after tables have been cleared', async () => {
   vi.spyOn(db.foods, 'bulkPut').mockRejectedValueOnce(new Error('Simulated storage failure'))
   await expect(repo.restoreBackup({ ...backup, patients: [] })).rejects.toThrow('storage failure')
   expect(await repo.patients.list()).toEqual([patient])
-  expect(await repo.foods.list()).toHaveLength(72)
+  expect(await repo.foods.list()).toHaveLength(defaultFoodCount)
 })
 it('imports independent plans and preserves previously assigned patient-visible history', async () => {
   const patient = await repo.patients.save(person())
@@ -63,7 +66,7 @@ it('imports independent plans and preserves previously assigned patient-visible 
 it('does not leave foods or diets behind when import assignment fails', async () => {
   await expect(repo.importDiet(sampleDiet(await repo.foods.list()), 'missing')).rejects.toThrow()
   expect(await repo.diets.list()).toHaveLength(0)
-  expect(await repo.foods.list()).toHaveLength(72)
+  expect(await repo.foods.list()).toHaveLength(defaultFoodCount)
 })
 it('rejects measurements and appointments with missing patients', async () => {
   await expect(repo.measurements.save({ id: id(), createdAt: now(), updatedAt: now(), patientId: 'missing', date: '2026-01-01', weightKg: 70, circumferencesCm: {}, notes: '', enteredBy: 'patient' })).rejects.toThrow('Paziente')

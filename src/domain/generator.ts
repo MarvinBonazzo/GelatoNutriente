@@ -4,7 +4,7 @@ import type { Diet, Food, Meal, Patient } from './models'
 type Slot = { names: string[]; grams: number }
 const grain = ['Pasta di semola', 'Riso bianco', 'Farro', 'Cous cous', 'Quinoa']
 const proteins = ['Petto di pollo', 'Merluzzo', 'Ceci', 'Salmone', 'Lenticchie', 'Tofu al naturale', 'Petto di tacchino']
-const vegetables = ['Zucchine', 'Broccoli', 'Carote', 'Spinaci', 'Pomodori', 'Finocchi', 'Peperoni']
+const vegetables = ['Zucchine', 'Broccoli', 'Carote', 'Spinaci', 'Pomodori', 'Finocchi', 'Peperoni', 'Fagiolini verdi', 'Cavolfiore', 'Bietole', 'Asparagi']
 const fruits = ['Mela', 'Pera', 'Arancia', 'Kiwi', 'Fragole', 'Pesca', 'Mirtilli']
 const nuts = ['Mandorle', 'Noci', 'Nocciole']
 const templates: { name: string; fraction: number; slots: Slot[] }[] = [

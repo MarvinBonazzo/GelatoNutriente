@@ -145,6 +145,18 @@ main { padding: 36px 40px 0; max-width: 1500px; margin: 0 auto; min-height: calc
 .macro-label { font-size: 14px; display: flex; align-items: center; gap: 5px; color: #647c63; }.dot { display: inline-flex; width: 6px; height: 6px; border-radius: 50%; }
 .protein { background: #799d82; }.carbs { background: #d6b581; }.fat { background: #9dabca; }
 .macro-bar { display: flex; height: 5px; border-radius: 5px; overflow: hidden; background: #dce8dc; margin-top: 17px; gap: 2px; }
+.macro-percent { display: block; font-size: 11px !important; line-height: 1.35; }
+.macro-target-caption { margin-top: 11px; color: #647c63; font-size: 12px; line-height: 1.6; }
+.energy-estimate { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 17px; border-radius: 10px; background: #edf4ed; border: 1px solid #d8e6da; }
+.energy-estimate > div { display: grid; gap: 7px; }
+.energy-estimate span { color: var(--muted); font-size: 12px; line-height: 1.5; }
+.energy-estimate strong { font: 24px Georgia, serif; color: #365f49; }
+.energy-estimate > small { grid-column: 1 / -1; color: var(--muted); line-height: 1.6; }
+.macro-target-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+.macro-total { margin-top: 12px; font-size: 13px; }
+.macro-total.valid { color: #36704d; }
+.macro-total.invalid { color: #a34832; }
+.question-number { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; margin-right: 7px; border-radius: 50%; background: #e7efe5; color: #537752; font-size: 12px; }
 .day-card { display: grid; gap: 15px; }
 .meal-card { background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; transition: border-color .15s; }.meal-card.selected { border-color: #96b4a0; }
 .meal-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 13px 16px; border-bottom: 1px solid #edf0eb; }
@@ -370,6 +382,8 @@ main { padding: 36px 40px 0; max-width: 1500px; margin: 0 auto; min-height: calc
   .form-section { padding: 12px; }
   .form-stack input, .form-stack select, .form-stack textarea, .ingredient-choice select { font-size: 16px; }
   .reference-box, .import-review { padding: 13px; }
+  .energy-estimate, .macro-target-grid { grid-template-columns: 1fr; }
+  .energy-estimate > small { grid-column: 1; }
   .reminder-banner { padding: 14px; }
 }
 .diet-document-actions { display: flex; gap: 10px; flex-wrap: wrap; }

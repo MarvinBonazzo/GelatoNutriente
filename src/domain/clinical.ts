@@ -8,6 +8,45 @@ export function addYears(date: string, years: number) {
   if (value.getUTCMonth() !== month) value.setUTCDate(0)
   return value.toISOString().slice(0, 10)
 }
+
+export const energyFormulaSource = 'https://pubmed.ncbi.nlm.nih.gov/2305711/'
+export const energyReferenceSource = 'https://www.efsa.europa.eu/sites/default/files/2017_09_DRVs_summary_report.pdf'
+type ActivityLevel = NonNullable<NonNullable<Patient['energyProfile']>['activityLevel']>
+export const activityFactors: Record<ActivityLevel, number> = {
+  low: 1.4,
+  moderate: 1.6,
+  active: 1.8,
+  'very-active': 2,
+}
+
+export function ageOnDate(birthDate: string, date = today()) {
+  if (!isLocalDate(birthDate) || !isLocalDate(date) || birthDate > date) throw new Error('Data di nascita non valida.')
+  let age = Number(date.slice(0, 4)) - Number(birthDate.slice(0, 4))
+  if (date.slice(5) < birthDate.slice(5)) age--
+  return age
+}
+
+/** Adult estimate: Mifflin-St Jeor REE multiplied by the selected EFSA PAL. */
+export function estimateEnergyNeeds(patient: Pick<Patient, 'id' | 'birthDate' | 'heightCm' | 'sexForFormula' | 'initialAssessment' | 'anthropometryContext' | 'energyProfile'>, measurements: Measurement[] = [], date = today()) {
+  if (!patient.birthDate) throw new Error('Indica la data di nascita.')
+  const age = ageOnDate(patient.birthDate, date)
+  if (age < 19) throw new Error('La stima automatica è disponibile dai 19 anni.')
+  if (patient.anthropometryContext === 'pregnancy') throw new Error('In gravidanza la stima automatica è sospesa: serve una valutazione specifica.')
+  if (patient.anthropometryContext === 'altered-composition') throw new Error('Con composizione corporea o fluidi alterati la stima automatica è sospesa.')
+  if (!patient.sexForFormula) throw new Error('Indica il sesso usato dalla formula.')
+  const heightCm = patient.heightCm ?? patient.initialAssessment?.heightCm
+  if (!heightCm || !Number.isFinite(heightCm) || heightCm < 100 || heightCm > 250) throw new Error('Inserisci un’altezza valida.')
+  const latestWeight = measurements
+    .filter(m => m.patientId === patient.id && m.date <= date && m.weightKg !== undefined)
+    .sort((a, b) => b.date.localeCompare(a.date) || b.updatedAt.localeCompare(a.updatedAt))[0]
+  const weightKg = latestWeight?.weightKg ?? patient.initialAssessment?.weightKg
+  if (!weightKg || !Number.isFinite(weightKg) || weightKg <= 0 || weightKg > 1000) throw new Error('Inserisci il peso della prima visita o una misurazione recente.')
+  const activityLevel = patient.energyProfile?.activityLevel
+  if (!activityLevel) throw new Error('Seleziona il livello di attività fisica.')
+  const restingKcal = 10 * weightKg + 6.25 * heightCm - 5 * age + (patient.sexForFormula === 'male' ? 5 : -161)
+  const maintenanceKcal = restingKcal * activityFactors[activityLevel]
+  return { age, weightKg, heightCm, restingKcal, maintenanceKcal, activityFactor: activityFactors[activityLevel], olderThanOriginalSample: age > 78 }
+}
 export const patientDiets = (diets: Diet[], patientId: string, date = today()) => diets.filter(d => d.patientId === patientId && (d.patientVisible ?? d.status === 'assigned') && (!d.endsOn || date <= addYears(d.endsOn, 1)))
 export const recentMeasurements = (values: Measurement[], date = today()) => values.filter(m => m.date >= addYears(date, -2) && m.date <= date)
 

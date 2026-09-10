@@ -44,6 +44,15 @@ export function totalNutrients(portions: Portion[]): Nutrients {
 export const mealNutrients = (meal: Meal) => totalNutrients(meal.portions)
 export const variantNutrients = (variant: DayVariant) => totalNutrients(variant.meals.flatMap(meal => meal.portions))
 
+export function macroEnergyPercentages(nutrients: Pick<Nutrients, 'protein' | 'carbs' | 'fat'>) {
+  const proteinKcal = nutrients.protein * 4
+  const carbsKcal = nutrients.carbs * 4
+  const fatKcal = nutrients.fat * 9
+  const total = proteinKcal + carbsKcal + fatKcal
+  if (!total) return { protein: 0, carbs: 0, fat: 0 }
+  return { protein: proteinKcal / total * 100, carbs: carbsKcal / total * 100, fat: fatKcal / total * 100 }
+}
+
 export function cloneVariant(variant: DayVariant, name: string): DayVariant {
   return { ...structuredClone(variant), id: id(), name, meals: variant.meals.map(meal => ({ ...structuredClone(meal), id: id(), portions: meal.portions.map(portion => ({ ...structuredClone(portion), id: id(), alternatives: portion.alternatives?.map(a => ({ ...structuredClone(a), id: id() })) })) })) }
 }

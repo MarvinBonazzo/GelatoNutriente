@@ -1,26 +1,27 @@
-# Verifica di GelatoNutriente v0.3
+# Verifica di GelatoNutriente v0.4
 
-Data dell’ultimo controllo: 9 settembre 2026. Ambiente locale: macOS, Node.js 26.3.0, npm 11.16.0. Il workflow GitHub usa Node.js 24; non è stato eseguito sul runner remoto durante questa modifica.
+Data dell’ultimo controllo: 11 settembre 2026. Ambiente locale: macOS, Node.js 26.3.0, npm 11.16.0. Il workflow GitHub usa Node.js 24; non è stato eseguito sul runner remoto durante questa modifica.
 
 ## Controlli eseguiti
 
 | Controllo | Risultato |
 | --- | --- |
 | `npm run check` | Passato: TypeScript strict, test e build statica |
-| `npm test` | 81 test passati in 6 file |
-| Build | `dist/` generata; avviso non bloccante sul bundle principale di circa 567 kB (169 kB gzip). Grafici e PDF sono caricati su richiesta |
+| `npm test` | 86 test passati in 6 file |
+| Build | `dist/` generata; avviso non bloccante sul bundle principale di circa 587 kB (175 kB gzip). Grafici e PDF sono caricati su richiesta |
 | Asset nella sottocartella Pages | HTML e 12 percorsi di asset letti interamente con HTTP 200 sotto `/GelatoNutriente/`; nessun asset HTML con percorso assoluto dalla radice |
-| Server di sviluppo | Riavviato su `http://127.0.0.1:5173/`, HTTP 200 |
+| Server di sviluppo | Riavviato su `http://127.0.0.1:5173/`, HTTP 200; interfaccia controllata nel browser senza errori console |
 | `npm audit --omit=dev` | Nessuna vulnerabilità segnalata al momento del controllo |
 | `git diff --check` | Passato |
 | PDF classico | Fixture sintetica: 7 pagine, tutti i giorni e l’alternativa ingrediente presenti |
 | PDF compatto | Stessa fixture: 4 pagine, più giorni per foglio |
-| Questionario PDF | 1 pagina, campi vuoti per compilazione su carta |
+| Questionario PDF | 2 pagine, 14 aree di anamnesi con campi vuoti per compilazione su carta |
 | Verifica documenti | Render Poppler e ispezione visiva delle pagine; controllo dei limiti pagina tramite pdfplumber |
 
 ## Copertura dei test
 
-- Nutrienti per 100 g, snapshot, varianti indipendenti e ID univoci; dataset di 72 alimenti.
+- Nutrienti per 100 g, snapshot, varianti indipendenti e ID univoci; catalogo di 249 alimenti e migrazione seed non distruttiva.
+- Percentuali energetiche 4/4/9, stima Mifflin–St Jeor con PAL, sospensione per dati o contesti non applicabili e validazione degli obiettivi macro al 100%.
 - Validazione di date, sette giorni, porzioni, assegnazioni e riferimenti al paziente.
 - Generazione di bozze fisse e multiple con energia definita, rispetto delle esclusioni, errore senza modifica dell’originale se manca un gruppo necessario.
 - Aggregazione della spesa per data, settimane ripetute, alternative di giornata e sostituzioni di ingredienti senza doppio conteggio.

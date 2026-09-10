@@ -31,7 +31,7 @@ export function PatientPlan({ preview = false }: { preview?: boolean }) {
       <div className="week-tabs" role="tablist" aria-label="Giorni della dieta">{weekdays.map((name, i) => <button key={name} role="tab" aria-selected={weekday === i} className={weekday === i ? 'active' : ''} onClick={() => { setWeekday(i); setVariantId('') }}><span>{name}</span></button>)}</div>
       <div className="day-heading"><h2>{weekdays[weekday]}</h2><span>{variant.meals.length} pasti</span></div>
       {day.variants.length > 1 && <label className="variant-selector">Scegli una delle alternative della giornata<select value={variant.id} onChange={e => setVariantId(e.target.value)}>{day.variants.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}</select></label>}
-      <NutrientSummary nutrients={variantNutrients(variant)} />
+      <NutrientSummary nutrients={variantNutrients(variant)} targetKcal={patient?.energyProfile?.targetKcal} macroTargets={patient?.energyProfile?.macroTargets} />
       <DayCard day={day} variantId={variant.id} readOnly />
       {diet.notes && <section className="panel patient-notes"><h2>Note del piano</h2><p>{diet.notes}</p></section>}
     </>}

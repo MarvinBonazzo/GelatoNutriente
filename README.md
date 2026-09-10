@@ -30,14 +30,15 @@ npm run preview    # Anteprima della build, normalmente sulla porta 4173
 
 1. **Piani alimentari**: crea un piano, imposta nome, paziente, periodo e note.
 2. **Settimana**: sette giorni indipendenti, ciascuno con cinque pasti iniziali modificabili. Puoi aggiungere o eliminare pasti.
-3. **Alimenti e porzioni**: cerca nel catalogo, aggiungi l’alimento al pasto selezionato e modifica i grammi. Calorie e macronutrienti si aggiornano immediatamente.
+3. **Alimenti e porzioni**: cerca in un catalogo di 249 alimenti, aggiungi l’alimento al pasto selezionato e modifica i grammi. Calorie, grammi e percentuali energetiche dei macronutrienti si aggiornano immediatamente.
 4. **Alternative**: “+ Variante” duplica la variante aperta con nuovi identificatori. Rinominala e modifica i pasti; il segno di spunta indica quella principale. Le alternative non si sommano.
 5. **Copia giornata**: copia tutti i pasti e le varianti su un altro giorno. Se il destinatario ha alimenti, viene richiesta conferma della sostituzione.
 6. **Pazienti**: aggiungi e modifica nome, obiettivi e note; apri il relativo piano.
 7. **Salvataggio e assegnazione**: “Salva piano” conserva i dati nel browser. “Assegna piano” rende il piano disponibile nella vista paziente locale. Ogni paziente ha un solo piano corrente; i piani precedentemente assegnati rimangono consultabili nello storico paziente entro il periodo di visibilità.
 8. **Vista paziente**: consulta il piano assegnato, cambia giorno e visualizza una variante alternativa. “Anteprima paziente” nell’editor mostra invece la bozza aperta, comprese le modifiche non salvate.
 9. **Lista della spesa**: scegli un piano salvato, un intervallo di date e una variante per ciascuna data. Genera la lista e spunta gli alimenti acquistati: le spunte vengono salvate automaticamente. Nella vista paziente trovi il pulsante “Lista della spesa” accanto al periodo del piano.
-10. **Compila settimana**: crea una bozza fissa o con due varianti al giorno, scalando template alimentari all’energia inserita dal nutrizionista. Rispetta le esclusioni selezionate e favorisce le preferenze compatibili. Non interpreta automaticamente allergie o testo libero: serve una revisione prima dell’assegnazione.
+10. **Fabbisogno e questionario**: la scheda paziente stima metabolismo a riposo e mantenimento da età, sesso, peso, altezza e PAL; raccoglie 14 aree di anamnesi e consente al professionista di confermare kcal e ripartizione macro.
+11. **Compila settimana**: crea una bozza fissa o con due varianti al giorno, proponendo l’obiettivo kcal confermato o la stima di mantenimento. Rispetta le esclusioni selezionate e favorisce le preferenze compatibili. Non interpreta automaticamente allergie o testo libero: serve una revisione prima dell’assegnazione.
 11. **Alternative per ingrediente**: aggiungi un sostituto con porzione propria nel pasto. Nella spesa si sceglie per data l’alimento effettivamente acquistato; PDF e vista paziente mostrano tutte le opzioni. I totali nell’editor e nel PDF si riferiscono agli alimenti principali, senza sommare sostituti.
 12. **Misurazioni**: inserimento, modifica, eliminazione, grafico e tabella di peso e cinque circonferenze, in entrambe le viste.
 13. **Appuntamenti**: calendario mensile, inserimento/modifica/stato, prossimi incontri, promemoria nell’app e download `.ics` con allarme. Nessun messaggio viene inviato automaticamente.
@@ -94,7 +95,7 @@ public/              Favicon e .nojekyll
 src/
   app/               Shell, routing e CSS responsive
   components/        DayCard, MealCard, catalogo, form, grafico
-  data/foods.json    Dataset iniziale di 72 alimenti
+  data/              Dataset iniziale di 249 alimenti e schede farmaci
   domain/            Modelli, calcoli, generatore, spesa, calendario, PDF e file
   pages/             Editor, pazienti, catalogo, spesa, misure, agenda, impostazioni
   repositories/      Contratti, implementazione IndexedDB, composition root
@@ -115,7 +116,7 @@ Patient ──< Diet ──< DietDay ──< DayVariant ──< Meal ──< Por
 
 - Quantità in **grammi**, peso in **kg**, circonferenze in **cm**. I liquidi hanno comunque valori e quantità per grammo, non per ml.
 - `nutriente = valorePer100g × grammi / 100`; si arrotonda solo in presentazione.
-- Le calorie dichiarate dell’alimento sono la fonte del totale kcal. La barra dei macro usa la ripartizione energetica 4/4/9; i due valori non sono obbligati a coincidere.
+- Le calorie dichiarate dell’alimento sono la fonte del totale kcal. Le percentuali dei macro usano la ripartizione energetica 4/4/9; i due valori non sono obbligati a coincidere. Se il paziente ha obiettivi confermati, l’editor mostra anche avanzamento kcal, confronto percentuale e grammi-obiettivo.
 - Ogni porzione salva uno **snapshot nutrizionale**: modificare un alimento nel catalogo in futuro non riscriverà una dieta esistente.
 - Per ogni giorno si conta una sola variante. Nell’editor i totali riguardano la variante aperta; le schede della settimana mostrano quella principale.
 - Le diete sono schemi settimanali ripetibili; l’aggregatore spesa percorre date reali, estremi inclusi, anche oltre la settimana.
@@ -126,7 +127,7 @@ Patient ──< Diet ──< DietDay ──< DayVariant ──< Meal ──< Por
 
 ## Dataset alimenti
 
-Il JSON iniziale contiene **72 alimenti comuni**, con nome, categoria, preparazione, kcal, proteine, carboidrati e grassi per 100 g. I numeri sono **valori indicativi dimostrativi compilati per questo prototipo**, non un’estrazione né una riproduzione certificata di CREA o di Nutriverso. Preparazione, marca, parte edibile e criterio di calcolo dei carboidrati possono cambiare i valori reali.
+Il catalogo iniziale contiene **249 alimenti comuni**, inclusi fagiolini verdi e un assortimento più ampio di cereali, proteine animali e vegetali, latticini, legumi, verdura, frutta, semi, grassi e alternative vegetali. Ogni record contiene nome, categoria, preparazione, kcal, proteine, carboidrati e grassi per 100 g. I numeri sono **valori medi indicativi per questo prototipo**, non un’estrazione certificata di CREA: preparazione, marca, parte edibile e criterio di calcolo dei carboidrati possono cambiare i valori reali.
 
 Prima di impiegarli per piani reali, sostituisci o integra il catalogo con valori verificati e una fonte coerente. Il form “Nuovo alimento” consente di inserire la fonte dell’etichetta. Le [tabelle CREA](https://www.alimentinutrizione.it/tabelle-nutrizionali/ricerca-per-alimento) sono un riferimento da consultare e validare, **non la fonte dichiarata del dataset incluso**.
 

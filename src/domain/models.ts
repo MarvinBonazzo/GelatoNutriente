@@ -29,11 +29,27 @@ export interface Patient extends Entity {
   anthropometryContext?: 'standard' | 'pregnancy' | 'altered-composition'
   sexForFormula?: 'female' | 'male'
   targetWeight?: { kg: number; method: 'manual' | 'devine' | 'robinson' | 'miller' | 'bmi'; confirmedAt: Instant }
+  energyProfile?: {
+    activityLevel?: 'low' | 'moderate' | 'active' | 'very-active'
+    goal?: 'lose' | 'maintain' | 'gain'
+    targetKcal?: number
+    macroTargets?: { carbsPercent: number; proteinPercent: number; fatPercent: number }
+  }
   intake?: {
     preferences: string
     exclusions: string
     allergies: string
     habits: string
+    mealsAndSchedule?: string
+    workAndActivity?: string
+    cookingAndBudget?: string
+    hydration?: string
+    sleepAndStress?: string
+    digestion?: string
+    conditions?: string
+    supplements?: string
+    alcoholAndSmoking?: string
+    dietHistory?: string
     preferredFoodIds: ID[]
     excludedFoodIds: ID[]
   }

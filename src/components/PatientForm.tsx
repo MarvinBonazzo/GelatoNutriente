@@ -10,7 +10,7 @@ export function PatientForm({ patient, onSaved, onCancel }: { patient?: Patient;
   const [notes, setNotes] = useState(patient?.notes ?? '')
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
-  const [clinical, setClinical] = useState<ClinicalProfile>({ initialAssessment: patient?.initialAssessment, anthropometryContext: patient?.anthropometryContext, birthDate: patient?.birthDate, heightCm: patient?.heightCm, sexForFormula: patient?.sexForFormula, targetWeight: patient?.targetWeight, intake: patient?.intake, medications: patient?.medications })
+  const [clinical, setClinical] = useState<ClinicalProfile>({ initialAssessment: patient?.initialAssessment, anthropometryContext: patient?.anthropometryContext, birthDate: patient?.birthDate, heightCm: patient?.heightCm, sexForFormula: patient?.sexForFormula, targetWeight: patient?.targetWeight, energyProfile: patient?.energyProfile, intake: patient?.intake, medications: patient?.medications })
   const savePatient = useAppStore(s => s.savePatient)
   async function submit(event: FormEvent) {
     event.preventDefault(); setSaving(true); setError('')

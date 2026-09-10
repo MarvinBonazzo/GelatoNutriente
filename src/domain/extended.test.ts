@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import seed from '../data/foods.json'
-import { addYears, patientDiets, recentMeasurements, referenceWeight, validateMeasurement } from './clinical'
+import { addYears, ageOnDate, estimateEnergyNeeds, patientDiets, recentMeasurements, referenceWeight, validateMeasurement } from './clinical'
 import { appointmentIcs, dueAppointments, validateAppointment } from './calendar'
 import { cloneImportedPlan, decodeTransfer, encryptTransfer, parseSharedPlan, sharedPlan } from './transfer'
 import { createDiet, createPortion, cloneVariant, id, now, variantNutrients } from './diet'
@@ -21,6 +21,22 @@ function planWithAlternative() {
   return { diet, portion, alt: portion.alternatives[0] }
 }
 describe('clinical reference and archive windows', () => {
+  it('stima metabolismo a riposo e mantenimento usando peso recente e PAL', () => {
+    const profile = { ...person, initialAssessment: { date: '2026-01-01', weightKg: 70, heightCm: 177.8 }, energyProfile: { activityLevel: 'moderate' as const, goal: 'maintain' as const } }
+    const result = estimateEnergyNeeds(profile, [{ ...measurement, weightKg: 75, heightCm: 177.8 }, { ...measurement, id: 'foreign', patientId: 'other', date: '2026-09-01', weightKg: 200 }], '2026-09-10')
+    expect(result.age).toBe(46)
+    expect(result.weightKg).toBe(75)
+    expect(result.restingKcal).toBeCloseTo(1636.25)
+    expect(result.maintenanceKcal).toBeCloseTo(2618)
+    expect(ageOnDate('1980-09-11', '2026-09-10')).toBe(45)
+  })
+  it('sospende la stima energetica con dati mancanti, minori e contesti specifici', () => {
+    const complete = { ...person, initialAssessment: { date: '2026-01-01', weightKg: 70, heightCm: 177.8 }, energyProfile: { activityLevel: 'low' as const, goal: 'maintain' as const } }
+    expect(() => estimateEnergyNeeds({ ...complete, birthDate: undefined })).toThrow('nascita')
+    expect(() => estimateEnergyNeeds({ ...complete, birthDate: '2010-01-01' }, [], '2026-09-10')).toThrow('19 anni')
+    expect(() => estimateEnergyNeeds({ ...complete, anthropometryContext: 'pregnancy' })).toThrow('gravidanza')
+    expect(() => estimateEnergyNeeds({ ...complete, energyProfile: undefined })).toThrow('attività')
+  })
   it('calculates published reference equations for ten inches above five feet', () => {
     expect(referenceWeight(person, 'devine')).toBeCloseTo(73)
     expect(referenceWeight(person, 'robinson')).toBeCloseTo(71)
@@ -144,7 +160,7 @@ it('exports all seven days and questionnaire as printable PDFs', () => {
   const questionnaire = buildQuestionnairePdf(undefined, studio, foods)
   expect(classic.getNumberOfPages()).toBe(7)
   expect(compact.getNumberOfPages()).toBeLessThan(7)
-  expect(questionnaire.getNumberOfPages()).toBe(1)
+  expect(questionnaire.getNumberOfPages()).toBe(2)
   if (process.env.GENERATE_PDF_FIXTURES === '1') {
     mkdirSync('artifacts/pdf-qa', { recursive: true })
     for (const [name, doc] of [['classico', classic], ['compatto', compact], ['questionario', questionnaire]] as const) writeFileSync(`artifacts/pdf-qa/${name}.pdf`, Buffer.from(doc.output('arraybuffer')))

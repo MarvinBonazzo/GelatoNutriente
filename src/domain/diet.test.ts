@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import seedFoods from '../data/foods.json'
+import { extraFoods } from '../data/extra-foods'
 import type { Food } from './models'
-import { cloneVariant, createDiet, createPortion, isLocalDate, sampleDiet, totalNutrients, validateDiet, validateNutrients, variantNutrients } from './diet'
+import { cloneVariant, createDiet, createPortion, isLocalDate, macroEnergyPercentages, sampleDiet, totalNutrients, validateDiet, validateNutrients, variantNutrients } from './diet'
 
-const foods = seedFoods as Food[]
+const foods = [...seedFoods as Food[], ...extraFoods]
 const pasta = foods.find(f => f.name === 'Pasta di semola')!
 const oil = foods.find(f => f.name === 'Olio extravergine di oliva')!
 
@@ -17,6 +18,10 @@ describe('calcoli nutrizionali', () => {
   })
   it('calcola un totale zero per un pasto vuoto', () => {
     expect(totalNutrients([])).toEqual({ kcal: 0, protein: 0, carbs: 0, fat: 0 })
+  })
+  it('calcola la percentuale energetica dei macronutrienti con fattori 4/4/9', () => {
+    expect(macroEnergyPercentages({ protein: 25, carbs: 50, fat: 100 / 9 })).toEqual({ protein: 25, carbs: 50, fat: 25 })
+    expect(macroEnergyPercentages({ protein: 0, carbs: 0, fat: 0 })).toEqual({ protein: 0, carbs: 0, fat: 0 })
   })
   it('mantiene immutabile lo snapshot del cibo inserito', () => {
     const food = structuredClone(pasta)
@@ -76,9 +81,9 @@ describe('struttura del piano e validazione', () => {
     const diet = createDiet(); diet.startsOn = '2026-09-08'; diet.endsOn = '2026-09-07'
     expect(() => validateDiet(diet)).toThrow('date')
   })
-  it('include 50–100 alimenti, tutti validi e con fonte e preparazione', () => {
-    expect(foods.length).toBeGreaterThanOrEqual(50)
-    expect(foods.length).toBeLessThanOrEqual(100)
+  it('include oltre 200 alimenti, fagiolini verdi e valori validi con ID univoci', () => {
+    expect(foods.length).toBeGreaterThan(200)
+    expect(foods.some(food => food.name === 'Fagiolini verdi')).toBe(true)
     expect(new Set(foods.map(f => f.id)).size).toBe(foods.length)
     for (const food of foods) {
       validateNutrients(food.per100g)

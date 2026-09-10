@@ -3,6 +3,8 @@ import { id, now, sampleDiet } from '../domain/diet'
 import { createShoppingRecord, generateShoppingList } from '../domain/shopping'
 import type { Patient } from '../domain/models'
 import { createIndexedDbRepositories, LocalDatabase } from './indexed-db'
+import seedFoods from '../data/foods.json'
+import { extraFoods } from '../data/extra-foods'
 
 let db: LocalDatabase
 let repo: ReturnType<typeof createIndexedDbRepositories>
@@ -13,14 +15,25 @@ beforeEach(async () => {
 })
 afterEach(async () => { await db.delete() })
 const patient = (name = 'Paziente test'): Patient => ({ id: id(), name, goals: '', notes: '', createdAt: now(), updatedAt: now() })
+const defaultFoodCount = seedFoods.length + extraFoods.length
 
 describe('repository IndexedDB', () => {
   it('inizializza solo alimenti, senza pazienti dimostrativi e senza duplicazioni', async () => {
     expect(await repo.patients.list()).toEqual([])
     const foods = await repo.foods.list()
-    expect(foods).toHaveLength(72)
+    expect(foods).toHaveLength(defaultFoodCount)
     await repo.initialize()
-    expect(await repo.foods.list()).toHaveLength(72)
+    expect(await repo.foods.list()).toHaveLength(defaultFoodCount)
+  })
+  it('aggiunge i nuovi alimenti a un catalogo esistente senza sovrascrivere quelli presenti', async () => {
+    const existing = (await repo.foods.list()).find(food => food.id === 'food-001')!
+    await db.foods.put({ ...existing, name: 'Pasta personalizzata' })
+    await db.foods.delete(extraFoods[0].id)
+    await db.meta.delete('seed-foods-v2')
+    await repo.initialize()
+    expect((await db.foods.get(existing.id))?.name).toBe('Pasta personalizzata')
+    expect((await db.foods.get(extraFoods[0].id))?.name).toBe(extraFoods[0].name)
+    expect(await repo.foods.list()).toHaveLength(defaultFoodCount)
   })
   it('conserva dati e alimenti personalizzati alla riapertura del database', async () => {
     const person = await repo.patients.save(patient())
@@ -31,7 +44,13 @@ describe('repository IndexedDB', () => {
     db = new LocalDatabase(databaseName); repo = createIndexedDbRepositories(db)
     await repo.initialize()
     expect((await repo.patients.get(person.id))?.name).toBe('Paziente test')
-    expect(await repo.foods.list()).toHaveLength(73)
+    expect(await repo.foods.list()).toHaveLength(defaultFoodCount + 1)
+  })
+  it('salva obiettivi calorici e macro soltanto quando le percentuali totalizzano 100', async () => {
+    const energyProfile = { activityLevel: 'moderate' as const, goal: 'maintain' as const, targetKcal: 2100, macroTargets: { carbsPercent: 45, proteinPercent: 25, fatPercent: 30 } }
+    const saved = await repo.patients.save({ ...patient(), energyProfile })
+    expect((await repo.patients.get(saved.id))?.energyProfile).toEqual(energyProfile)
+    await expect(repo.patients.save({ ...saved, energyProfile: { ...energyProfile, macroTargets: { ...energyProfile.macroTargets, fatPercent: 20 } } })).rejects.toThrow()
   })
   it('salva piano e assegnazione in un’unica transazione', async () => {
     const person = await repo.patients.save(patient())
@@ -78,7 +97,7 @@ describe('repository IndexedDB', () => {
     expect(exported.format).toBe('gelatonutriente')
     expect(exported.schemaVersion).toBe(1)
     expect(exported.patients).toHaveLength(1)
-    expect(exported.foods).toHaveLength(72)
+    expect(exported.foods).toHaveLength(defaultFoodCount)
     expect(exported.appointments).toEqual([])
   })
 })

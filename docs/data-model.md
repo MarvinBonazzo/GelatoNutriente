@@ -29,12 +29,20 @@ interface Patient extends Entity {
   anthropometryContext?: "standard" | "pregnancy" | "altered-composition";
   sexForFormula?: "female" | "male";
   targetWeight?: { kg: number; method: "manual" | "devine" | "robinson" | "miller" | "bmi"; confirmedAt: Instant };
-  intake?: { preferences: string; exclusions: string; allergies: string; habits: string; preferredFoodIds: ID[]; excludedFoodIds: ID[] };
+  energyProfile?: {
+    activityLevel?: "low" | "moderate" | "active" | "very-active";
+    goal?: "lose" | "maintain" | "gain";
+    targetKcal?: number;
+    macroTargets?: { carbsPercent: number; proteinPercent: number; fatPercent: number };
+  };
+  intake?: { preferences: string; exclusions: string; allergies: string; habits: string; /* più campi anamnestici opzionali */ preferredFoodIds: ID[]; excludedFoodIds: ID[] };
   medications?: { id: ID; activeIngredient: string; product: string; notes: string; active: boolean }[];
 }
 ```
 
 Un paziente può avere molti piani, con un solo piano corrente assegnato. Le assegnazioni precedenti conservano `patientVisible` per lo storico. L’anagrafica non è un account e non contiene credenziali.
+
+Il mantenimento energetico è una stima per adulti: dispendio a riposo Mifflin–St Jeor moltiplicato per il PAL selezionato (1,4–2,0). Il deficit o surplus non viene applicato automaticamente. La kcal-obiettivo e la ripartizione macro sono valori separati, confermati dal nutrizionista; le tre percentuali devono totalizzare 100.
 
 ## Dieta, giorno, variante, pasto e porzione
 

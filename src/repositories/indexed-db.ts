@@ -1,6 +1,7 @@
 import { validatePatientAnthropometry } from '../domain/anthropometry'
 import Dexie, { type Table } from 'dexie'
 import seedFoods from '../data/foods.json'
+import { extraFoods } from '../data/extra-foods'
 import { now, validateDiet, validateNutrients } from '../domain/diet'
 import { generateShoppingList } from '../domain/shopping'
 import { validateMeasurement } from '../domain/clinical'
@@ -65,9 +66,13 @@ export function createIndexedDbRepositories(db = new LocalDatabase()): Repositor
     shoppingLists: { ...tableRepository(db.shoppingLists), save: list => repositories.saveShoppingList(list) },
     async initialize() {
       await db.transaction('rw', db.foods, db.meta, async () => {
-        if (!(await db.meta.get('seed-foods-v1'))) {
-          await db.foods.bulkPut(seedFoods as Food[])
+        if (!(await db.meta.get('seed-foods-v2'))) {
+          const defaults = [...seedFoods as Food[], ...extraFoods]
+          const existingIds = new Set(await db.foods.toCollection().primaryKeys())
+          const missing = defaults.filter(food => !existingIds.has(food.id))
+          if (missing.length) await db.foods.bulkAdd(missing)
           await db.meta.put({ key: 'seed-foods-v1', value: 1 })
+          await db.meta.put({ key: 'seed-foods-v2', value: 2 })
         }
       })
     },
@@ -154,6 +159,7 @@ export function createIndexedDbRepositories(db = new LocalDatabase()): Repositor
         await db.measurements.bulkPut(backup.measurements); await db.appointments.bulkPut(backup.appointments); await db.shoppingLists.bulkPut(backup.shoppingLists)
         if (backup.studio) await db.studio.put(backup.studio)
         await db.meta.put({ key: 'seed-foods-v1', value: 1 })
+        await db.meta.put({ key: 'seed-foods-v2', value: 2 })
       })
     },
   }

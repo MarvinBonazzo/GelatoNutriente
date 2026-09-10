@@ -25,7 +25,11 @@ export const patientSchema = z.object({
   initialAssessment: z.object({ date, weightKg: z.number().positive().max(1000), heightCm: z.number().min(50).max(250), waistCm: z.number().positive().max(1000).optional() }).optional(),
   anthropometryContext: z.enum(['standard', 'pregnancy', 'altered-composition']).optional(),
   targetWeight: z.object({ kg: z.number().positive().max(1000), method: z.enum(['manual', 'devine', 'robinson', 'miller', 'bmi']), confirmedAt: instant }).optional(),
-  intake: z.object({ preferences: text, exclusions: text, allergies: text, habits: text, preferredFoodIds: z.array(identifier), excludedFoodIds: z.array(identifier) }).optional(),
+  energyProfile: z.object({
+    activityLevel: z.enum(['low', 'moderate', 'active', 'very-active']).optional(), goal: z.enum(['lose', 'maintain', 'gain']).optional(), targetKcal: z.number().positive().max(10000).optional(),
+    macroTargets: z.object({ carbsPercent: z.number().min(0).max(100), proteinPercent: z.number().min(0).max(100), fatPercent: z.number().min(0).max(100) }).refine(v => Math.abs(v.carbsPercent + v.proteinPercent + v.fatPercent - 100) < .01, 'Le percentuali dei macronutrienti devono totalizzare 100.').optional(),
+  }).optional(),
+  intake: z.object({ preferences: text, exclusions: text, allergies: text, habits: text, mealsAndSchedule: text.optional(), workAndActivity: text.optional(), cookingAndBudget: text.optional(), hydration: text.optional(), sleepAndStress: text.optional(), digestion: text.optional(), conditions: text.optional(), supplements: text.optional(), alcoholAndSmoking: text.optional(), dietHistory: text.optional(), preferredFoodIds: z.array(identifier), excludedFoodIds: z.array(identifier) }).optional(),
   medications: z.array(z.object({ id: identifier, activeIngredient: text, product: text, notes: text, active: z.boolean() })).optional(),
 })
 const positive = z.number().positive().max(1000).optional()
