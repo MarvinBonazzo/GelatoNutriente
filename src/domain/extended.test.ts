@@ -150,7 +150,7 @@ describe('generated plans and ingredient alternatives', () => {
     expect(draft.status).toBe('draft'); expect(draft.patientVisible).toBe(false)
     for (const day of draft.days) {
       expect(day.variants).toHaveLength(mode === 'fixed' ? 1 : 2)
-      for (const variant of day.variants) expect(Math.abs(variantNutrients(variant).kcal - 1800)).toBeLessThan(2)
+      for (const variant of day.variants) expect(Math.abs(variantNutrients(variant).kcal - 1800)).toBeLessThan(10)
     }
   })
   it.each(macroProfiles)('fits energy and the $label macro profile within a practical tolerance', profile => {
@@ -158,11 +158,21 @@ describe('generated plans and ingredient alternatives', () => {
     for (const day of draft.days) {
       const nutrients = variantNutrients(day.variants[0])
       const percentages = macroEnergyPercentages(nutrients)
-      expect(Math.abs(nutrients.kcal - 2000)).toBeLessThan(3)
+      expect(Math.abs(nutrients.kcal - 2000)).toBeLessThan(25)
       expect(Math.abs(percentages.carbs - profile.targets.carbsPercent)).toBeLessThan(5)
       expect(Math.abs(percentages.protein - profile.targets.proteinPercent)).toBeLessThan(5)
       expect(Math.abs(percentages.fat - profile.targets.fatPercent)).toBeLessThan(5)
     }
+  })
+  it('keeps generated portions within practical food-specific limits', () => {
+    const draft = generateDietDraft(createDiet(), foods, person, 2000, 'fixed')
+    const portions = draft.days.flatMap(day => day.variants.flatMap(variant => variant.meals.flatMap(meal => meal.portions)))
+    const byName = (name: string) => portions.filter(portion => portion.foodSnapshot.name === name)
+    expect(byName('Latte parzialmente scremato').length).toBeGreaterThan(0)
+    expect(byName('Latte parzialmente scremato').every(portion => portion.grams <= 250)).toBe(true)
+    expect([...byName('Mandorle'), ...byName('Noci'), ...byName('Nocciole')].every(portion => portion.grams <= 30)).toBe(true)
+    expect(byName('Olio extravergine di oliva').every(portion => portion.grams <= 20)).toBe(true)
+    expect(portions.every(portion => Number.isInteger(portion.grams))).toBe(true)
   })
   it('validates editable macro percentages and converts them to gram targets with 4/4/9', () => {
     expect(macroGramTargets(2000, { carbsPercent: 50, proteinPercent: 20, fatPercent: 30 })).toEqual({ carbs: 250, protein: 100, fat: 200 / 3 })

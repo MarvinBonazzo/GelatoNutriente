@@ -3,20 +3,43 @@ import { defaultMacroTargets, macroGramTargets, validateMacroTargets, type Macro
 import type { Diet, Food, Meal, Patient, Portion } from './models'
 
 type Slot = { names: string[]; grams: number; min: number; max: number }
+type ServingGuide = Pick<Slot, 'grams' | 'min' | 'max'>
 const grain = ['Pasta di semola', 'Riso bianco', 'Farro', 'Cous cous', 'Quinoa']
-const proteins = ['Petto di pollo', 'Petto di tacchino', 'Merluzzo', 'Tonno al naturale', 'Albume', 'Bresaola', 'Ceci', 'Salmone', 'Lenticchie', 'Tofu al naturale']
+// Alternating lean, oily and plant sources also avoids days in which both main
+// meals accidentally rely on two low-protein choices.
+const proteins = ['Petto di pollo', 'Ceci', 'Petto di tacchino', 'Salmone', 'Merluzzo', 'Tonno al naturale', 'Lenticchie', 'Manzo magro', 'Tofu al naturale', 'Uovo intero', 'Orata', 'Fagioli cannellini']
 const vegetables = ['Zucchine', 'Broccoli', 'Carote', 'Spinaci', 'Pomodori', 'Finocchi', 'Peperoni', 'Fagiolini verdi', 'Cavolfiore', 'Bietole', 'Asparagi']
 const fruits = ['Mela', 'Pera', 'Arancia', 'Kiwi', 'Fragole', 'Pesca', 'Mirtilli']
 const nuts = ['Mandorle', 'Noci', 'Nocciole']
 const templates: { name: string; fraction: number; slots: Slot[] }[] = [
-  { name: 'Colazione', fraction: .22, slots: [{ names: ['Fiocchi di avena', 'Pane integrale', 'Fette biscottate'], grams: 45, min: 10, max: 150 }, { names: ['Yogurt greco bianco 0%', 'Yogurt bianco intero', 'Latte parzialmente scremato'], grams: 150, min: 50, max: 500 }, { names: fruits, grams: 100, min: 50, max: 400 }] },
-  { name: 'Spuntino', fraction: .08, slots: [{ names: fruits, grams: 150, min: 50, max: 400 }, { names: nuts, grams: 10, min: 1, max: 80 }] },
-  { name: 'Pranzo', fraction: .35, slots: [{ names: grain, grams: 80, min: 20, max: 250 }, { names: proteins, grams: 120, min: 30, max: 450 }, { names: vegetables, grams: 150, min: 50, max: 600 }, { names: ['Olio extravergine di oliva'], grams: 10, min: 1, max: 50 }] },
-  { name: 'Merenda', fraction: .08, slots: [{ names: fruits, grams: 150, min: 50, max: 400 }, { names: nuts, grams: 10, min: 1, max: 80 }] },
-  { name: 'Cena', fraction: .27, slots: [{ names: proteins, grams: 150, min: 30, max: 450 }, { names: ['Patate', 'Pane integrale', 'Riso integrale'], grams: 100, min: 20, max: 300 }, { names: vegetables, grams: 200, min: 50, max: 600 }, { names: ['Olio extravergine di oliva'], grams: 10, min: 1, max: 50 }] },
+  { name: 'Colazione', fraction: .22, slots: [{ names: ['Fiocchi di avena', 'Pane integrale', 'Fette biscottate'], grams: 45, min: 20, max: 110 }, { names: ['Yogurt greco bianco 0%', 'Yogurt bianco intero', 'Latte parzialmente scremato'], grams: 150, min: 100, max: 250 }, { names: fruits, grams: 100, min: 50, max: 250 }] },
+  { name: 'Spuntino', fraction: .08, slots: [{ names: fruits, grams: 150, min: 50, max: 250 }, { names: nuts, grams: 10, min: 5, max: 30 }] },
+  { name: 'Pranzo', fraction: .35, slots: [{ names: grain, grams: 80, min: 40, max: 140 }, { names: proteins, grams: 120, min: 60, max: 250 }, { names: vegetables, grams: 150, min: 80, max: 350 }, { names: ['Olio extravergine di oliva'], grams: 10, min: 5, max: 20 }] },
+  { name: 'Merenda', fraction: .08, slots: [{ names: fruits, grams: 150, min: 50, max: 250 }, { names: nuts, grams: 10, min: 5, max: 30 }] },
+  { name: 'Cena', fraction: .27, slots: [{ names: proteins, grams: 150, min: 60, max: 250 }, { names: ['Patate', 'Pane integrale', 'Riso integrale'], grams: 100, min: 40, max: 220 }, { names: vegetables, grams: 200, min: 80, max: 350 }, { names: ['Olio extravergine di oliva'], grams: 10, min: 5, max: 20 }] },
 ]
 
-type AdjustablePortion = { portion: Portion; mealIndex: number; min: number; max: number }
+// Food-specific guides prevent the optimizer from treating nutritionally similar
+// foods as if they had the same practical serving size (for example milk and yogurt).
+const servingGuides: Record<string, ServingGuide> = {
+  'Latte parzialmente scremato': { grams: 200, min: 150, max: 250 },
+  'Yogurt bianco intero': { grams: 150, min: 100, max: 200 },
+  'Yogurt greco bianco 0%': { grams: 170, min: 100, max: 250 },
+  Mandorle: { grams: 15, min: 5, max: 30 },
+  Noci: { grams: 15, min: 5, max: 30 },
+  Nocciole: { grams: 15, min: 5, max: 30 },
+  'Olio extravergine di oliva': { grams: 10, min: 5, max: 20 },
+  Salmone: { grams: 150, min: 80, max: 220 },
+  'Uovo intero': { grams: 120, min: 80, max: 180 },
+}
+
+type AdjustablePortion = { portion: Portion; mealIndex: number; min: number; max: number; step: number }
+
+function practicalStep(foodName: string) {
+  if (foodName === 'Latte parzialmente scremato') return 10
+  if (foodName === 'Olio extravergine di oliva' || nuts.includes(foodName)) return 1
+  return 5
+}
 
 function optimizePortions(entries: AdjustablePortion[], targetKcal: number, targets: MacroTargets) {
   const gramTargets = macroGramTargets(targetKcal, targets)
@@ -72,6 +95,44 @@ function optimizePortions(entries: AdjustablePortion[], targetKcal: number, targ
     if (!selected) break
     selected.entry.portion.grams = selected.grams
   }
+  // Present portions in quantities people can actually measure. The nutritional
+  // values are estimates, so decimal tenths of a gram would imply false precision.
+  for (const entry of entries) entry.portion.grams = Math.min(entry.max, Math.max(entry.min, Math.round(entry.portion.grams / entry.step) * entry.step))
+  for (let pass = 0; pass < 12; pass++) {
+    let selected: { entry: AdjustablePortion; grams: number; score: number } | undefined
+    const currentScore = score()
+    for (const entry of entries) {
+      const original = entry.portion.grams
+      for (const candidate of [original - entry.step, original + entry.step]) {
+        if (candidate < entry.min || candidate > entry.max) continue
+        entry.portion.grams = candidate
+        const candidateScore = score()
+        entry.portion.grams = original
+        if (candidateScore + 1e-12 < currentScore && (!selected || candidateScore < selected.score)) selected = { entry, grams: candidate, score: candidateScore }
+      }
+    }
+    if (!selected) break
+    selected.entry.portion.grams = selected.grams
+  }
+  // Once the macro fit is stable, use the same measurable increments to close
+  // the remaining energy gap without reintroducing fractional-gram portions.
+  for (let pass = 0; pass < 30; pass++) {
+    const currentError = Math.abs(targetKcal - totalNutrients(entries.map(entry => entry.portion)).kcal)
+    let selected: { entry: AdjustablePortion; grams: number; error: number; score: number } | undefined
+    for (const entry of entries) {
+      const original = entry.portion.grams
+      for (const candidate of [original - entry.step, original + entry.step]) {
+        if (candidate < entry.min || candidate > entry.max) continue
+        entry.portion.grams = candidate
+        const error = Math.abs(targetKcal - totalNutrients(entries.map(item => item.portion)).kcal)
+        const candidateScore = score()
+        entry.portion.grams = original
+        if (error + 1e-9 < currentError && (!selected || error < selected.error || (error === selected.error && candidateScore < selected.score))) selected = { entry, grams: candidate, error, score: candidateScore }
+      }
+    }
+    if (!selected) break
+    selected.entry.portion.grams = selected.grams
+  }
 }
 
 /** Deterministic template compiler. It honors structured patient choices and fits clinician-defined energy and macro targets. */
@@ -100,8 +161,10 @@ export function generateDietDraft(diet: Diet, foods: Food[], patient: Patient | 
       const adjustable: AdjustablePortion[] = []
       const meals = templates.map((template, mealIndex): Meal => {
         const portions = template.slots.map((slot, i) => {
-          const portion = createPortion(choose(slot, day.weekday + v + mealIndex + i), slot.grams)
-          adjustable.push({ portion, mealIndex, min: slot.min, max: slot.max })
+          const food = choose(slot, day.weekday + v + mealIndex + i)
+          const guide = servingGuides[food.name] ?? slot
+          const portion = createPortion(food, guide.grams)
+          adjustable.push({ portion, mealIndex, min: guide.min, max: guide.max, step: practicalStep(food.name) })
           return portion
         })
         return { id: id(), name: template.name, portions }

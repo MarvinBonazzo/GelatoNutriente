@@ -139,9 +139,14 @@ main { padding: 36px 40px 0; max-width: 1500px; margin: 0 auto; min-height: calc
 .nutrients { border: 1px solid #d8e6da; background: #edf4ed; border-radius: 10px; padding: 16px 18px; margin-bottom: 19px; }
 .nutrient-heading { display: flex; align-items: center; justify-content: space-between; font-size: 14px; color: #4e6e55; margin-bottom: 15px; gap: 10px; }
 .nutrient-heading .eyebrow { font-size: 14px; letter-spacing: 1px; color: #6b8b6a; }
-.nutrient-values { display: grid; grid-template-columns: 1fr 1fr 1.15fr .8fr; gap: 10px; align-items: center; }
+.daily-energy-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid #d5e1d3; }
+.daily-energy-summary > div { display: grid; gap: 4px; }
+.daily-energy-summary span { color: #647c63; font-size: 12px; }
+.daily-energy-summary strong { color: #315b43; font-size: 21px; font-variant-numeric: tabular-nums; }
+.daily-energy-summary strong small { color: #647c63; font-size: 12px; font-weight: 500; }
+.daily-energy-summary > div > small { color: #758679; font-size: 11px; }
+.nutrient-values { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; align-items: center; }
 .nutrient-values > div { display: flex; flex-direction: column; gap: 6px; }.nutrient-values strong { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }.nutrient-values small { font-weight: 400; font-size: 14px; color: #758679; }
-.nutrient-values .energy { border-right: 1px solid #d5e1d3; margin-right: 8px; gap: 1px; }.energy strong { font-size: 28px; letter-spacing: -1px; }.energy > span { font-size: 14px; color: #768673; }
 .macro-label { font-size: 14px; display: flex; align-items: center; gap: 5px; color: #647c63; }.dot { display: inline-flex; width: 6px; height: 6px; border-radius: 50%; }
 .protein { background: #799d82; }.carbs { background: #d6b581; }.fat { background: #9dabca; }
 .macro-bar { display: flex; height: 5px; border-radius: 5px; overflow: hidden; background: #dce8dc; margin-top: 17px; gap: 2px; }
@@ -234,6 +239,9 @@ main { padding: 36px 40px 0; max-width: 1500px; margin: 0 auto; min-height: calc
 .plan-name-row, .food-item, .portion-row { overflow-wrap: anywhere; }
 @media (max-width: 550px) {
   .portion-kcal, .portion-kcal small, .food-energy small, .energy > span, .nutrient-values small { font-size: 12px; }
+  .nutrient-values { grid-template-columns: repeat(3, 1fr); }
+  .daily-energy-summary { gap: 7px; }
+  .daily-energy-summary strong { font-size: 18px; }
   .plan-fields input, .plan-fields select, .plan-name, .search-box input, .grams input, .plan-notes textarea { font-size: 16px; }
   .plan-toolbar .save-status { flex-shrink: 0; }
   .save-bar > div:first-child { gap: 8px; }
