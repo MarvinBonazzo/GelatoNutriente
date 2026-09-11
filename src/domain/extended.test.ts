@@ -4,8 +4,9 @@ import seed from '../data/foods.json'
 import { addYears, ageOnDate, compareEnergyMethods, energyMethods, estimateEnergyNeeds, patientDiets, recentMeasurements, referenceWeight, resolveEnergyTarget, validateMeasurement } from './clinical'
 import { appointmentIcs, dueAppointments, validateAppointment } from './calendar'
 import { cloneImportedPlan, decodeTransfer, encryptTransfer, parseSharedPlan, sharedPlan } from './transfer'
-import { createDiet, createPortion, cloneVariant, id, now, variantNutrients } from './diet'
+import { createDiet, createPortion, cloneVariant, id, macroEnergyPercentages, now, variantNutrients } from './diet'
 import { generateDietDraft } from './generator'
+import { macroGramTargets, macroProfiles, validateMacroTargets } from './macros'
 import { generateShoppingList } from './shopping'
 import { buildDietPdf, buildQuestionnairePdf } from './pdf'
 import { findMedicationEffect } from '../data/medication-effects'
@@ -133,6 +134,29 @@ describe('generated plans and ingredient alternatives', () => {
       expect(day.variants).toHaveLength(mode === 'fixed' ? 1 : 2)
       for (const variant of day.variants) expect(Math.abs(variantNutrients(variant).kcal - 1800)).toBeLessThan(2)
     }
+  })
+  it.each(macroProfiles)('fits energy and the $label macro profile within a practical tolerance', profile => {
+    const draft = generateDietDraft(createDiet(), foods, person, 2000, 'fixed', profile.targets)
+    for (const day of draft.days) {
+      const nutrients = variantNutrients(day.variants[0])
+      const percentages = macroEnergyPercentages(nutrients)
+      expect(Math.abs(nutrients.kcal - 2000)).toBeLessThan(3)
+      expect(Math.abs(percentages.carbs - profile.targets.carbsPercent)).toBeLessThan(5)
+      expect(Math.abs(percentages.protein - profile.targets.proteinPercent)).toBeLessThan(5)
+      expect(Math.abs(percentages.fat - profile.targets.fatPercent)).toBeLessThan(5)
+    }
+  })
+  it('validates editable macro percentages and converts them to gram targets with 4/4/9', () => {
+    expect(macroGramTargets(2000, { carbsPercent: 50, proteinPercent: 20, fatPercent: 30 })).toEqual({ carbs: 250, protein: 100, fat: 200 / 3 })
+    expect(() => validateMacroTargets({ carbsPercent: 45, proteinPercent: 25, fatPercent: 20 })).toThrow('100%')
+  })
+  it('uses the macro distribution saved on the selected patient when no draft override is supplied', () => {
+    const personalized = { ...person, energyProfile: { macroProfile: 'higher-carb' as const, macroTargets: { carbsPercent: 55, proteinPercent: 20, fatPercent: 25 } } }
+    const draft = generateDietDraft(createDiet(), foods, personalized, 1900, 'fixed')
+    const percentages = macroEnergyPercentages(variantNutrients(draft.days[0].variants[0]))
+    expect(percentages.carbs).toBeCloseTo(55, -1)
+    expect(percentages.protein).toBeCloseTo(20, -1)
+    expect(percentages.fat).toBeCloseTo(25, -1)
   })
   it('honors explicit exclusions and fails without changing the input if a required group is unavailable', () => {
     const excluded = foods.find(f => f.name === 'Mela')!

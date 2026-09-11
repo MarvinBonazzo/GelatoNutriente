@@ -38,6 +38,7 @@ export interface Patient extends Entity {
     kcalPerKg?: number
     adjustmentKcal?: number
     targetKcal?: number
+    macroProfile?: 'general' | 'moderate-carb' | 'higher-protein' | 'higher-carb' | 'lower-carb' | 'custom'
     macroTargets?: { carbsPercent: number; proteinPercent: number; fatPercent: number }
   }
   intake?: {

@@ -177,6 +177,17 @@ main { padding: 36px 40px 0; max-width: 1500px; margin: 0 auto; min-height: calc
 .macro-total { margin-top: 12px; font-size: 13px; }
 .macro-total.valid { color: #36704d; }
 .macro-total.invalid { color: #a34832; }
+.macro-grams { padding: 11px 13px; border-radius: 8px; background: #f2f6ed; color: #53695a; font-size: 13px; line-height: 1.6; }
+.patient-generator-summary { display: grid; gap: 5px; padding: 14px 16px; border-left: 3px solid var(--green); background: #f2f6ed; color: #53695a; }
+.patient-generator-summary strong { color: #314e39; }
+.patient-generator-summary span { font-size: 13px; line-height: 1.5; }
+.generator-why { display: grid; gap: 8px; padding: 16px; border: 1px solid #d8e6da; border-radius: 10px; background: #fbfcf8; }
+.generator-why strong { color: #365f49; }
+.generator-why p { color: var(--muted); font-size: 13px; line-height: 1.65; }
+.generator-review { border: 1px solid var(--line); border-radius: 9px; padding: 13px 15px; }
+.generator-review summary { cursor: pointer; font-weight: 600; color: #48624f; }
+.generator-review ul { margin: 12px 0 0 18px; display: grid; gap: 8px; }
+.generator-review li, .generator-review p { color: var(--muted); font-size: 13px; line-height: 1.55; overflow-wrap: anywhere; }
 .question-number { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; margin-right: 7px; border-radius: 50%; background: #e7efe5; color: #537752; font-size: 12px; }
 .day-card { display: grid; gap: 15px; }
 .meal-card { background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; transition: border-color .15s; }.meal-card.selected { border-color: #96b4a0; }

@@ -47,7 +47,7 @@ describe('repository IndexedDB', () => {
     expect(await repo.foods.list()).toHaveLength(defaultFoodCount + 1)
   })
   it('salva obiettivi calorici e macro soltanto quando le percentuali totalizzano 100', async () => {
-    const energyProfile = { activityLevel: 'moderate' as const, goal: 'maintain' as const, calculationMethod: 'cunningham' as const, bodyFatPercent: 24, adjustmentKcal: -200, targetKcal: 2100, macroTargets: { carbsPercent: 45, proteinPercent: 25, fatPercent: 30 } }
+    const energyProfile = { activityLevel: 'moderate' as const, goal: 'maintain' as const, calculationMethod: 'cunningham' as const, bodyFatPercent: 24, adjustmentKcal: -200, targetKcal: 2100, macroProfile: 'moderate-carb' as const, macroTargets: { carbsPercent: 45, proteinPercent: 25, fatPercent: 30 } }
     const saved = await repo.patients.save({ ...patient(), energyProfile })
     expect((await repo.patients.get(saved.id))?.energyProfile).toEqual(energyProfile)
     await expect(repo.patients.save({ ...saved, energyProfile: { ...energyProfile, macroTargets: { ...energyProfile.macroTargets, fatPercent: 20 } } })).rejects.toThrow()

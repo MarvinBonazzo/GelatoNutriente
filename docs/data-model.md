@@ -39,6 +39,7 @@ interface Patient extends Entity {
     kcalPerKg?: number;
     adjustmentKcal?: number;
     targetKcal?: number;
+    macroProfile?: "general" | "moderate-carb" | "higher-protein" | "higher-carb" | "lower-carb" | "custom";
     macroTargets?: { carbsPercent: number; proteinPercent: number; fatPercent: number };
   };
   intake?: { preferences: string; exclusions: string; allergies: string; habits: string; /* più campi anamnestici opzionali */ preferredFoodIds: ID[]; excludedFoodIds: ID[] };
@@ -50,7 +51,9 @@ Un paziente può avere molti piani, con un solo piano corrente assegnato. Le ass
 
 Il fabbisogno energetico è una stima per adulti. Il metodo predefinito è Mifflin–St Jeor; sono selezionabili anche Harris–Benedict originale e rivista, Schofield, Owen, Cunningham, Katch–McArdle, calorimetria indiretta e coefficiente kcal/kg. Le equazioni predittive e la misura a riposo sono moltiplicate per il PAL selezionato (1,4–2,0); kcal/kg produce direttamente la stima giornaliera. Cunningham e Katch–McArdle richiedono la percentuale di massa grassa, mentre la calorimetria richiede il valore misurato.
 
-`adjustmentKcal` è una correzione con segno decisa dal professionista e genera il risultato calcolato. `targetKcal`, se valorizzato, è un override manuale e diventa il valore usato da riepiloghi e generatore. Il deficit o surplus non deriva automaticamente dal campo `goal`. La ripartizione macro è separata e le tre percentuali devono totalizzare 100.
+`adjustmentKcal` è una correzione con segno decisa dal professionista e genera il risultato calcolato. `targetKcal`, se valorizzato, è un override manuale e diventa il valore usato da riepiloghi e generatore. Il deficit o surplus non deriva automaticamente dal campo `goal`. La ripartizione macro è separata e le tre percentuali devono totalizzare 100. `macroProfile` conserva il punto di partenza scelto; `macroTargets` conserva sempre i valori effettivi, anche quando il professionista li modifica.
+
+Il compilatore settimanale converte le percentuali in grammi con 4 kcal/g per carboidrati e proteine e 9 kcal/g per i grassi. Un’ottimizzazione deterministica modifica congiuntamente le porzioni entro limiti operativi per avvicinare energia, macro e distribuzione fra i cinque pasti. Le preferenze e le esclusioni identificate nel catalogo sono vincoli automatici; allergie, patologie, farmaci e testo libero restano informazioni da revisionare e non vengono interpretati come regole cliniche.
 
 ## Dieta, giorno, variante, pasto e porzione
 

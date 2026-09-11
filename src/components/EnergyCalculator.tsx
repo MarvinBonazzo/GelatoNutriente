@@ -1,6 +1,7 @@
 import type { Patient } from '../domain/models'
 import { compareEnergyMethods, energyMethods, estimateEnergyNeeds, energyReferenceSource, type EnergyCalculationMethod } from '../domain/clinical'
 import { useAppStore } from '../store/app-store'
+import { defaultMacroTargets, macroGramTargets, macroProfileIsModified, macroProfiles, type MacroProfileId } from '../domain/macros'
 import { format } from './NutrientSummary'
 
 type EnergyProfile = NonNullable<Patient['energyProfile']>
@@ -12,6 +13,10 @@ export function EnergyCalculator({ value, onChange, patientId }: { patientId?: s
   const method = energy?.calculationMethod ?? 'mifflin'
   const macroTargets = energy?.macroTargets
   const macroTotal = macroTargets ? macroTargets.carbsPercent + macroTargets.proteinPercent + macroTargets.fatPercent : 0
+  const macroValid = !!macroTargets && [macroTargets.carbsPercent, macroTargets.proteinPercent, macroTargets.fatPercent].every(item => Number.isFinite(item) && item >= 0 && item <= 100) && Math.abs(macroTotal - 100) < .01
+  const macroProfile = energy?.macroProfile ?? (macroTargets ? 'custom' : '')
+  const macroDefinition = macroProfiles.find(item => item.id === macroProfile)
+  const macroModified = macroProfileIsModified(energy?.macroProfile, macroTargets)
   const patient = { ...value, id: patientId ?? 'preview' }
   const relevantMeasurements = patientId ? measurements.filter(item => item.patientId === patientId) : []
   let estimate: ReturnType<typeof estimateEnergyNeeds> | undefined
@@ -21,6 +26,14 @@ export function EnergyCalculator({ value, onChange, patientId }: { patientId?: s
   const comparisons = compareEnergyMethods(patient, relevantMeasurements)
   const setEnergy = (patch: Partial<EnergyProfile>) => onChange({ ...value, energyProfile: { ...energy, ...patch } })
   const setNumber = (key: 'bodyFatPercent' | 'measuredRestingKcal' | 'kcalPerKg' | 'adjustmentKcal' | 'targetKcal', raw: string) => setEnergy({ [key]: raw === '' ? undefined : Number(raw) })
+  const macroGrams = macroTargets && macroValid && (energy?.targetKcal ?? estimate?.targetKcal) ? macroGramTargets(energy?.targetKcal ?? estimate!.targetKcal, macroTargets) : undefined
+  const chooseMacroProfile = (raw: string) => {
+    if (!raw) return setEnergy({ macroProfile: undefined, macroTargets: undefined })
+    const profile = raw as MacroProfileId
+    if (profile === 'custom') return setEnergy({ macroProfile: profile, macroTargets: macroTargets ?? { ...defaultMacroTargets } })
+    const definition = macroProfiles.find(item => item.id === profile)!
+    setEnergy({ macroProfile: profile, macroTargets: { ...definition.targets } })
+  }
 
   return <details className="form-section" open><summary>Fabbisogno calorico e obiettivi giornalieri</summary><div className="form-stack">
     <div className="form-grid">
@@ -51,6 +64,12 @@ export function EnergyCalculator({ value, onChange, patientId }: { patientId?: s
     <details className="energy-comparison"><summary>Confronta tutti i metodi ({energyMethods.length})</summary><div className="energy-method-list">{comparisons.map(item => <article key={item.method.id} className={item.method.id === method ? 'selected' : ''}><div><strong>{item.method.label}</strong><span>{item.method.description}</span></div>{item.estimate ? <div className="energy-method-value"><strong>{format(item.estimate.dailyKcal)} kcal</strong><small>{item.estimate.restingKcal !== undefined ? `riposo ${format(item.estimate.restingKcal)} · ` : ''}{item.estimate.formula}</small></div> : <small className="energy-method-missing">{item.error}</small>}<div className="energy-method-actions"><a href={item.estimate?.source ?? item.method.source} target="_blank" rel="noreferrer">Fonte</a><button type="button" className="text-link" onClick={() => setEnergy({ calculationMethod: item.method.id })}>{item.method.id === method ? 'Selezionato' : 'Usa metodo'}</button></div></article>)}</div></details>
 
     <p className="field-hint">Le equazioni sono stime per adulti e possono divergere. La calorimetria usa un valore realmente misurato; kcal/kg è una scorciatoia impostata dal professionista. Obiettivo del percorso e correzione non vengono dedotti automaticamente. I PAL sono riferimenti generali: <a href={energyReferenceSource} target="_blank" rel="noreferrer">riferimenti EFSA</a>.</p>
-    <fieldset><legend>Ripartizione energetica obiettivo dei macronutrienti</legend><label className="inline-check"><input type="checkbox" checked={!!macroTargets} onChange={event => setEnergy({ macroTargets: event.target.checked ? { carbsPercent: 45, proteinPercent: 25, fatPercent: 30 } : undefined })} />Imposta percentuali personalizzate</label>{macroTargets && <><div className="macro-target-grid"><label>Carboidrati (%)<input type="number" min="0" max="100" step="1" value={macroTargets.carbsPercent} onChange={event => setEnergy({ macroTargets: { ...macroTargets, carbsPercent: Number(event.target.value) } })} /></label><label>Proteine (%)<input type="number" min="0" max="100" step="1" value={macroTargets.proteinPercent} onChange={event => setEnergy({ macroTargets: { ...macroTargets, proteinPercent: Number(event.target.value) } })} /></label><label>Grassi (%)<input type="number" min="0" max="100" step="1" value={macroTargets.fatPercent} onChange={event => setEnergy({ macroTargets: { ...macroTargets, fatPercent: Number(event.target.value) } })} /></label></div><p className={Math.abs(macroTotal - 100) < .01 ? 'macro-total valid' : 'macro-total invalid'}>Totale: {format(macroTotal, 1)}% {Math.abs(macroTotal - 100) < .01 ? '✓' : '· deve essere 100%'}</p></>}</fieldset>
+    <fieldset><legend>Ripartizione energetica obiettivo dei macronutrienti</legend>
+      <label>Profilo di partenza<select value={macroProfile} onChange={event => chooseMacroProfile(event.target.value)}><option value="">Nessuna ripartizione</option>{macroProfiles.map(profile => <option key={profile.id} value={profile.id}>{profile.label}</option>)}<option value="custom">Personalizzata</option></select></label>
+      {macroTargets && <><div className="macro-target-grid"><label>Carboidrati (%)<input type="number" min="0" max="100" step="1" value={macroTargets.carbsPercent} onChange={event => setEnergy({ macroTargets: { ...macroTargets, carbsPercent: Number(event.target.value) } })} /></label><label>Proteine (%)<input type="number" min="0" max="100" step="1" value={macroTargets.proteinPercent} onChange={event => setEnergy({ macroTargets: { ...macroTargets, proteinPercent: Number(event.target.value) } })} /></label><label>Grassi (%)<input type="number" min="0" max="100" step="1" value={macroTargets.fatPercent} onChange={event => setEnergy({ macroTargets: { ...macroTargets, fatPercent: Number(event.target.value) } })} /></label></div><p className={macroValid ? 'macro-total valid' : 'macro-total invalid'}>Totale: {format(macroTotal, 1)}% {macroValid ? '✓' : '· ogni valore deve essere 0–100 e il totale 100%'}{macroModified ? ' · modificato dal professionista' : ''}</p>
+        {macroGrams && <p className="macro-grams">Con {format(energy?.targetKcal ?? estimate!.targetKcal)} kcal: circa <strong>{format(macroGrams.carbs, 1)} g carboidrati</strong>, <strong>{format(macroGrams.protein, 1)} g proteine</strong> e <strong>{format(macroGrams.fat, 1)} g grassi</strong>.</p>}
+        <p className="field-hint">{macroDefinition ? <>Perché questo profilo: {macroDefinition.rationale} <a href={macroDefinition.source} target="_blank" rel="noreferrer">Riferimento</a>.</> : 'Profilo interamente definito dal professionista.'} Le percentuali sono un obiettivo operativo e restano sempre modificabili.</p>
+      </>}
+    </fieldset>
   </div></details>
 }
