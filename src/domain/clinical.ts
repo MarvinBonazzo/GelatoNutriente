@@ -32,6 +32,43 @@ export const energyMethods: { id: EnergyCalculationMethod; label: string; descri
   { id: 'kcal-per-kg', label: 'Coefficiente kcal/kg', description: 'Stima rapida diretta: peso × coefficiente scelto dal professionista.', source: 'https://2022.espen.org/files/ESPEN-Guidelines/ESPEN_guideline_on_hospital_nutrition.pdf' },
 ]
 
+type EnergyProfile = NonNullable<Patient['energyProfile']>
+export type GoalStrategy = NonNullable<EnergyProfile['goalStrategy']>
+export const goalStrategies: { id: GoalStrategy; label: string; description: string; source: string }[] = [
+  { id: 'percentage', label: 'Percentuale del mantenimento', description: 'Applica una percentuale al TDEE: predefinita −15% per dimagrimento e +10% per aumento.', source: 'https://www.niddk.nih.gov/health-information/weight-management/adult-overweight-obesity/eating-physical-activity' },
+  { id: 'fixed-kcal', label: 'Scarto fisso in kcal', description: 'Sottrae o aggiunge un valore giornaliero: predefinito −500 kcal o +250 kcal.', source: 'https://www.nice.org.uk/guidance/ng246/evidence/cg43-full-guideline-section-5b-management-of-in-clinical-settings-adults-evidence-statements-and-reviews-pdf-195027234' },
+  { id: 'weekly-rate', label: 'Ritmo teorico kg/settimana', description: 'Converte il ritmo scelto con la regola statica di circa 7.700 kcal/kg; non simula l’adattamento metabolico.', source: 'https://pubmed.ncbi.nlm.nih.gov/23628852/' },
+  { id: 'none', label: 'Nessuna variazione automatica', description: 'Mantiene le kcal del TDEE; il professionista può usare la correzione o l’obiettivo manuale.', source: 'https://www.niddk.nih.gov/research-funding/technology-advancement-transfer/research-materials-licensing/body-weight-simulator-java-applet' },
+]
+
+function goalAdjustment(profile: EnergyProfile, maintenanceKcal: number) {
+  const goal = profile.goal
+  if (!goal || goal === 'maintain') return { goalStrategy: 'none' as const, goalStrategyLabel: 'Mantenimento', goalStrategySource: goalStrategies[3].source, goalAdjustmentKcal: 0, goalAdjustedKcal: maintenanceKcal, goalFormula: 'Mantenimento: nessun deficit o surplus' }
+  const direction = goal === 'lose' ? -1 : 1
+  const strategy = profile.goalStrategy ?? 'percentage'
+  const definition = goalStrategies.find(item => item.id === strategy)!
+  let magnitude = 0
+  let formula = definition.description
+  if (strategy === 'percentage') {
+    const percent = profile.goalPercent ?? (goal === 'lose' ? 15 : 10)
+    if (!Number.isFinite(percent) || percent < 1 || percent > 40) throw new Error('La percentuale dell’obiettivo deve essere compresa tra 1 e 40%.')
+    magnitude = maintenanceKcal * percent / 100
+    formula = `${goal === 'lose' ? '−' : '+'}${percent}% di ${Math.round(maintenanceKcal)} kcal`
+  } else if (strategy === 'fixed-kcal') {
+    const fixedKcal = profile.goalFixedKcal ?? (goal === 'lose' ? 500 : 250)
+    if (!Number.isFinite(fixedKcal) || fixedKcal < 50 || fixedKcal > 2000) throw new Error('Lo scarto fisso deve essere compreso tra 50 e 2.000 kcal.')
+    magnitude = fixedKcal
+    formula = `${goal === 'lose' ? '−' : '+'}${fixedKcal} kcal/giorno`
+  } else if (strategy === 'weekly-rate') {
+    const weeklyKg = profile.goalWeeklyKg ?? (goal === 'lose' ? .5 : .25)
+    if (!Number.isFinite(weeklyKg) || weeklyKg < .05 || weeklyKg > 2) throw new Error('Il ritmo teorico deve essere compreso tra 0,05 e 2 kg/settimana.')
+    magnitude = weeklyKg * 7700 / 7
+    formula = `${goal === 'lose' ? '−' : '+'}${weeklyKg} kg/settimana × 7.700 ÷ 7`
+  }
+  const goalAdjustmentKcal = direction * magnitude
+  return { goalStrategy: strategy, goalStrategyLabel: definition.label, goalStrategySource: definition.source, goalAdjustmentKcal, goalAdjustedKcal: Math.max(1, maintenanceKcal + goalAdjustmentKcal), goalFormula: formula }
+}
+
 export function ageOnDate(birthDate: string, date = today()) {
   if (!isLocalDate(birthDate) || !isLocalDate(date) || birthDate > date) throw new Error('Data di nascita non valida.')
   let age = Number(date.slice(0, 4)) - Number(birthDate.slice(0, 4))
@@ -116,17 +153,18 @@ export function estimateEnergyNeeds(patient: EnergyPatient, measurements: Measur
     }
     dailyKcal = restingKcal * activityFactors[activityLevel!]
   }
+  const goalResult = goalAdjustment(profile, dailyKcal)
   const adjustmentKcal = profile.adjustmentKcal ?? 0
   if (!Number.isFinite(adjustmentKcal) || adjustmentKcal < -3000 || adjustmentKcal > 3000) throw new Error('La correzione professionale deve essere compresa tra −3.000 e +3.000 kcal.')
-  const calculatedTargetKcal = Math.max(1, dailyKcal + adjustmentKcal)
+  const calculatedTargetKcal = Math.max(1, goalResult.goalAdjustedKcal + adjustmentKcal)
   if (profile.targetKcal !== undefined && (!Number.isFinite(profile.targetKcal) || profile.targetKcal <= 0 || profile.targetKcal > 10000)) throw new Error('L’obiettivo manuale deve essere positivo e non oltre 10.000 kcal.')
   const targetKcal = profile.targetKcal ?? calculatedTargetKcal
   const source = method === 'owen' && sex === 'female' ? 'https://pubmed.ncbi.nlm.nih.gov/3728346/' : definition.source
   return {
     method, methodLabel: definition.label, methodDescription: definition.description, source, formula,
-    age, weightKg, heightCm, restingKcal, maintenanceKcal: dailyKcal, dailyKcal, adjustmentKcal, calculatedTargetKcal, targetKcal,
+    age, weightKg, heightCm, restingKcal, maintenanceKcal: dailyKcal, dailyKcal, ...goalResult, adjustmentKcal, calculatedTargetKcal, targetKcal,
     manualOverride: profile.targetKcal !== undefined, activityFactor: needsPal ? activityFactors[activityLevel!] : undefined, leanMassKg,
-    olderThanOriginalSample: method === 'mifflin' && age > 78,
+    olderThanOriginalSample: method === 'mifflin' && age > 78, targetBelowResting: restingKcal !== undefined && calculatedTargetKcal < restingKcal,
   }
 }
 

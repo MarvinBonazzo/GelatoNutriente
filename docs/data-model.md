@@ -32,6 +32,10 @@ interface Patient extends Entity {
   energyProfile?: {
     activityLevel?: "low" | "moderate" | "active" | "very-active";
     goal?: "lose" | "maintain" | "gain";
+    goalStrategy?: "percentage" | "fixed-kcal" | "weekly-rate" | "none";
+    goalPercent?: number;
+    goalFixedKcal?: number;
+    goalWeeklyKg?: number;
     calculationMethod?: "mifflin" | "harris-original" | "harris-revised" | "schofield" | "owen"
       | "cunningham" | "katch-mcardle" | "indirect-calorimetry" | "kcal-per-kg";
     bodyFatPercent?: number;
@@ -51,7 +55,9 @@ Un paziente può avere molti piani, con un solo piano corrente assegnato. Le ass
 
 Il fabbisogno energetico è una stima per adulti. Il metodo predefinito è Mifflin–St Jeor; sono selezionabili anche Harris–Benedict originale e rivista, Schofield, Owen, Cunningham, Katch–McArdle, calorimetria indiretta e coefficiente kcal/kg. Le equazioni predittive e la misura a riposo sono moltiplicate per il PAL selezionato (1,4–2,0); kcal/kg produce direttamente la stima giornaliera. Cunningham e Katch–McArdle richiedono la percentuale di massa grassa, mentre la calorimetria richiede il valore misurato.
 
-`adjustmentKcal` è una correzione con segno decisa dal professionista e genera il risultato calcolato. `targetKcal`, se valorizzato, è un override manuale e diventa il valore usato da riepiloghi e generatore. Il deficit o surplus non deriva automaticamente dal campo `goal`. La ripartizione macro è separata e le tre percentuali devono totalizzare 100. `macroProfile` conserva il punto di partenza scelto; `macroTargets` conserva sempre i valori effettivi, anche quando il professionista li modifica.
+Il calcolo segue una sequenza esplicita: metodo energetico → mantenimento/TDEE → strategia dell’obiettivo → `adjustmentKcal` professionale → eventuale `targetKcal` manuale. Per dimagrimento o aumento, `goalStrategy` può applicare una percentuale del mantenimento, uno scarto fisso in kcal, oppure la conversione statica di un ritmo settimanale con 7.700 kcal/kg; `none` lascia invariato il mantenimento. I valori predefiniti sono −15% per dimagrimento, +10% per aumento, −500/+250 kcal per lo scarto fisso e −0,5/+0,25 kg/settimana per il ritmo teorico. Sono punti di partenza modificabili, non prescrizioni automatiche. Il mantenimento non applica deficit o surplus.
+
+`adjustmentKcal` è un’ulteriore correzione con segno decisa dal professionista. `targetKcal`, se valorizzato, ha priorità su tutti i calcoli e diventa il valore usato da riepiloghi e generatore. La ripartizione macro è separata e le tre percentuali devono totalizzare 100. `macroProfile` conserva il punto di partenza scelto; `macroTargets` conserva sempre i valori effettivi, anche quando il professionista li modifica.
 
 Il compilatore settimanale converte le percentuali in grammi con 4 kcal/g per carboidrati e proteine e 9 kcal/g per i grassi. Un’ottimizzazione deterministica modifica congiuntamente le porzioni entro limiti operativi per avvicinare energia, macro e distribuzione fra i cinque pasti. Le preferenze e le esclusioni identificate nel catalogo sono vincoli automatici; allergie, patologie, farmaci e testo libero restano informazioni da revisionare e non vengono interpretati come regole cliniche.
 

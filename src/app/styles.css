@@ -158,7 +158,12 @@ main { padding: 36px 40px 0; max-width: 1500px; margin: 0 auto; min-height: calc
 .energy-result-heading span { color: var(--muted); font-size: 12px; }
 .energy-result-heading a { color: var(--green); font-size: 13px; }
 .energy-result code { white-space: normal; color: #496251; background: #edf4ed; border-radius: 7px; padding: 10px 12px; line-height: 1.6; }
-.energy-result .energy-estimate { grid-template-columns: repeat(3, 1fr); padding: 0; border: 0; background: transparent; }
+.energy-result .energy-estimate { grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); padding: 0; border: 0; background: transparent; }
+.goal-calculation { display: grid; grid-template-columns: minmax(170px, .8fr) minmax(210px, 1.4fr) auto; align-items: center; gap: 12px; padding: 12px; border: 1px solid #dce6d9; border-radius: 8px; background: #fff; }
+.goal-calculation > div { display: grid; gap: 4px; }
+.goal-calculation span { color: var(--muted); font-size: 12px; }
+.goal-calculation code { padding: 7px 9px; font-size: 12px; }
+.goal-calculation a { color: var(--green); font-size: 12px; white-space: nowrap; }
 .energy-result .button { justify-self: start; }
 .energy-reset { justify-self: start; }
 .energy-comparison { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
@@ -416,6 +421,7 @@ main { padding: 36px 40px 0; max-width: 1500px; margin: 0 auto; min-height: calc
   .reference-box, .import-review { padding: 13px; }
   .energy-estimate, .energy-result .energy-estimate, .macro-target-grid { grid-template-columns: 1fr; }
   .energy-estimate > small { grid-column: 1; }
+  .goal-calculation { grid-template-columns: 1fr; }
   .energy-method-list article { grid-template-columns: 1fr; align-items: start; }
   .energy-method-actions { justify-content: flex-start; }
   .reminder-banner { padding: 14px; }

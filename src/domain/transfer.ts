@@ -27,6 +27,7 @@ export const patientSchema = z.object({
   targetWeight: z.object({ kg: z.number().positive().max(1000), method: z.enum(['manual', 'devine', 'robinson', 'miller', 'bmi']), confirmedAt: instant }).optional(),
   energyProfile: z.object({
     activityLevel: z.enum(['low', 'moderate', 'active', 'very-active']).optional(), goal: z.enum(['lose', 'maintain', 'gain']).optional(), targetKcal: z.number().positive().max(10000).optional(),
+    goalStrategy: z.enum(['percentage', 'fixed-kcal', 'weekly-rate', 'none']).optional(), goalPercent: z.number().min(1).max(40).optional(), goalFixedKcal: z.number().min(50).max(2000).optional(), goalWeeklyKg: z.number().min(.05).max(2).optional(),
     calculationMethod: z.enum(['mifflin', 'harris-original', 'harris-revised', 'schofield', 'owen', 'cunningham', 'katch-mcardle', 'indirect-calorimetry', 'kcal-per-kg']).optional(),
     bodyFatPercent: z.number().positive().max(75).optional(), measuredRestingKcal: z.number().min(200).max(10000).optional(), kcalPerKg: z.number().min(5).max(100).optional(), adjustmentKcal: z.number().min(-3000).max(3000).optional(),
     macroProfile: z.enum(['general', 'moderate-carb', 'higher-protein', 'higher-carb', 'lower-carb', 'custom']).optional(),

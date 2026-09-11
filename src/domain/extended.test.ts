@@ -56,7 +56,9 @@ describe('clinical reference and archive windows', () => {
   it('mantiene distinti calcolo, correzione professionale e obiettivo manuale', () => {
     const profile = { ...person, initialAssessment: { date: '2026-01-01', weightKg: 75, heightCm: 177.8 }, energyProfile: { activityLevel: 'moderate' as const, goal: 'lose' as const, adjustmentKcal: -300 } }
     const adjusted = estimateEnergyNeeds(profile, [], '2026-09-10')
-    expect(adjusted.calculatedTargetKcal).toBeCloseTo(adjusted.dailyKcal - 300)
+    expect(adjusted.goalAdjustmentKcal).toBeCloseTo(-adjusted.dailyKcal * .15)
+    expect(adjusted.goalAdjustedKcal).toBeCloseTo(adjusted.dailyKcal * .85)
+    expect(adjusted.calculatedTargetKcal).toBeCloseTo(adjusted.dailyKcal * .85 - 300)
     expect(adjusted.manualOverride).toBe(false)
     const manual = estimateEnergyNeeds({ ...profile, energyProfile: { ...profile.energyProfile, targetKcal: 2100 } }, [], '2026-09-10')
     expect(manual.calculatedTargetKcal).toBeCloseTo(adjusted.calculatedTargetKcal)
@@ -64,6 +66,22 @@ describe('clinical reference and archive windows', () => {
     expect(manual.manualOverride).toBe(true)
     expect(resolveEnergyTarget({ ...person, birthDate: undefined, energyProfile: { targetKcal: 2100 } }).targetKcal).toBe(2100)
     expect(() => estimateEnergyNeeds({ ...profile, energyProfile: { ...profile.energyProfile, calculationMethod: 'cunningham' } }, [], '2026-09-10')).toThrow('massa grassa')
+  })
+  it('applica le strategie più comuni a dimagrimento, aumento e mantenimento', () => {
+    const base = { ...person, initialAssessment: { date: '2026-01-01', weightKg: 75, heightCm: 177.8 }, energyProfile: { activityLevel: 'moderate' as const, goal: 'lose' as const } }
+    const maintenance = estimateEnergyNeeds({ ...base, energyProfile: { ...base.energyProfile, goal: 'maintain' } }, [], '2026-09-10')
+    expect(maintenance.goalAdjustmentKcal).toBe(0)
+    const percentLoss = estimateEnergyNeeds(base, [], '2026-09-10')
+    expect(percentLoss.calculatedTargetKcal).toBeCloseTo(maintenance.dailyKcal * .85)
+    const fixedLoss = estimateEnergyNeeds({ ...base, energyProfile: { ...base.energyProfile, goalStrategy: 'fixed-kcal' as const, goalFixedKcal: 600 } }, [], '2026-09-10')
+    expect(fixedLoss.goalAdjustmentKcal).toBe(-600)
+    const weeklyLoss = estimateEnergyNeeds({ ...base, energyProfile: { ...base.energyProfile, goalStrategy: 'weekly-rate' as const, goalWeeklyKg: .5 } }, [], '2026-09-10')
+    expect(weeklyLoss.goalAdjustmentKcal).toBeCloseTo(-550)
+    const percentGain = estimateEnergyNeeds({ ...base, energyProfile: { ...base.energyProfile, goal: 'gain' as const, goalPercent: 10 } }, [], '2026-09-10')
+    expect(percentGain.calculatedTargetKcal).toBeCloseTo(maintenance.dailyKcal * 1.1)
+    const noAutomaticChange = estimateEnergyNeeds({ ...base, energyProfile: { ...base.energyProfile, goalStrategy: 'none' as const } }, [], '2026-09-10')
+    expect(noAutomaticChange.calculatedTargetKcal).toBeCloseTo(maintenance.dailyKcal)
+    expect(() => estimateEnergyNeeds({ ...base, energyProfile: { ...base.energyProfile, goalPercent: 50 } }, [], '2026-09-10')).toThrow('1 e 40')
   })
   it('calculates published reference equations for ten inches above five feet', () => {
     expect(referenceWeight(person, 'devine')).toBeCloseTo(73)
